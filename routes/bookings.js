@@ -328,7 +328,13 @@ router.post("/login", async (req, res) => {
         expiresIn: "1hr",
       }
     );
-    res.status(201).json({ token: token, message: "Logged in successfully" });
+    res
+      .status(201)
+      .json({
+        token: token,
+        userid: user.id,
+        message: "Logged in successfully",
+      });
   } catch (err) {
     console.error("Error creating booking:", err);
     res.status(500).json({ message: "Failed to login" });
