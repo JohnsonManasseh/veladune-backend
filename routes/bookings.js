@@ -340,7 +340,7 @@ router.post("/login", async (req, res) => {
   }
 });
 
-router.get("/userdetails", async (req, res) => {
+router.post("/userdetails", async (req, res) => {
   try {
     const { id } = req.body;
 
