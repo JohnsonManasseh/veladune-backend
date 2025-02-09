@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const bookingRoutes = require("./routes/bookings");
+const cors = require("cors"); // Import cors package
 
 const multer = require("multer");
 
@@ -9,6 +10,13 @@ dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 5000;
+
+const corsOptions = {
+  origin: "*",
+  methods: "GET,POST,PUT,DELETE",
+  allowedHeaders: "Content-Type, Authorization",
+};
+app.use(cors(corsOptions));
 
 const upload = multer();
 app.use(upload.none());
