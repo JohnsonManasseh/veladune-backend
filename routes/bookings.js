@@ -23,7 +23,7 @@ router.post("/addbooking", async (req, res) => {
 
     if (missingFields.length > 0) {
       return res.status(400).json({
-        message: `${missingFields.join(",")} is missing `,
+        message: `${missingFields.join(",")} is missing`,
       });
     }
 
