@@ -12,15 +12,19 @@ router.post("/addbooking", async (req, res) => {
     const { customerName, checkInDate, checkOutDate, status, userId, roomId } =
       req.body;
 
-    if (
-      !customerName ||
-      !checkInDate ||
-      !checkOutDate ||
-      !status ||
-      !userId ||
-      !roomId
-    ) {
-      return res.status(400).json({ message: "All fields are required" });
+    const missingFields = [];
+
+    if (!customerName) missingFields.push("customerName");
+    if (!checkInDate) missingFields.push("checkInDate");
+    if (!checkOutDate) missingFields.push("checkOutDate");
+    if (!status) missingFields.push("status");
+    if (!userId) missingFields.push("userId");
+    if (!roomId) missingFields.push("roomId");
+
+    if (missingFields.length > 0) {
+      return res.status(400).json({
+        message: `${missingFields.join(",")}"are required" `,
+      });
     }
 
     const user = await User.findById(userId);
