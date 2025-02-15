@@ -36,7 +36,7 @@ router.post("/addbooking", async (req, res) => {
       return res.status(400).json({ message: "Room not found" });
     }
 
-    const checkRoomAvailable = room.bookings.some((b) => {
+    const checkRoomAvailable = room?.bookings?.some((b) => {
       const existingCheckInDate = new Date(b.checkInDate);
       const existingCheckOutDate = new Date(b.checkOutDate);
       const newCheckInDate = new Date(checkInDate);
