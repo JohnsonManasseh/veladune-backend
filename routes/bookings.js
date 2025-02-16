@@ -9,8 +9,23 @@ const bcrypt = require("bcryptjs");
 
 router.post("/addbooking", async (req, res) => {
   try {
-    const { customerName, checkInDate, checkOutDate, status, userId, roomId } =
-      req.body;
+    const {
+      customerName,
+      checkInDate,
+      checkOutDate,
+      status,
+      userId,
+      roomId,
+      firstName,
+      lastName,
+      gender,
+      email,
+      phoneNumber,
+      adults,
+      childrens,
+      infants,
+      address,
+    } = req.body;
 
     const missingFields = [];
 
@@ -20,6 +35,15 @@ router.post("/addbooking", async (req, res) => {
     if (!status) missingFields.push("status");
     if (!userId) missingFields.push("userId");
     if (!roomId) missingFields.push("roomId");
+    if (!firstName) missingFields.push("firstName");
+    if (!lastName) missingFields.push("lastName");
+    if (!gender) missingFields.push("gender");
+    if (!email) missingFields.push("email");
+    if (!phoneNumber) missingFields.push("phoneNumber");
+    if (!adults) missingFields.push("adults");
+    if (!childrens) missingFields.push("childrens");
+    if (!infants) missingFields.push("infants");
+    if (!address) missingFields.push("address");
 
     if (missingFields.length > 0) {
       return res.status(400).json({
@@ -68,6 +92,15 @@ router.post("/addbooking", async (req, res) => {
       userId,
       status,
       roomId,
+      firstName,
+      lastName,
+      gender,
+      email,
+      phoneNumber,
+      adults,
+      childrens,
+      infants,
+      address,
     });
     room.availability = false;
     room.bookings.push({ checkInDate, checkOutDate });
@@ -357,7 +390,13 @@ router.post("/userdetails", async (req, res) => {
       return res.status(400).json({ message: "User not found" });
     }
     const bookings = await Booking.find({ userId: id });
-    res.status(200).json({ user, bookings, message: "User details found" });
+    res.status(200).json({
+      user,
+      address: bookings.length > 0 ? bookings[0].address : null,
+
+      bookings,
+      message: "User details found",
+    });
   } catch (err) {
     console.error("Error finding details", err);
     res.status(500).json({ message: "Failed to find user" });

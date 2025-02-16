@@ -32,6 +32,42 @@ const bookingSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    firstName: {
+      type: String,
+      required: true,
+    },
+    lastName: {
+      type: String,
+      required: true,
+    },
+    gender: {
+      type: String,
+      required: true,
+    },
+    email: {
+      type: String,
+      required: true,
+    },
+    phoneNumber: {
+      type: Number,
+      required: true,
+    },
+    adults: {
+      type: Number,
+      required: true,
+    },
+    childrens: {
+      type: Number,
+      required: true,
+    },
+    infants: {
+      type: Number,
+      required: true,
+    },
+    address: {
+      type: String,
+      required: true,
+    },
   },
   {
     timestamps: true,
