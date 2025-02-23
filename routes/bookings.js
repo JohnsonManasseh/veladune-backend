@@ -6,6 +6,7 @@ const Room = require("../models/rooms");
 const JWT_SECRET = process.env.JWT_SECRET;
 const router = express.Router();
 const bcrypt = require("bcryptjs");
+const twilio = require("twilio");
 const client = twilio(
   "AC732aa520e5ae161e34c95b770dd06fbe",
   "5fe75ed1e11fe221edd34f118b9ca577"

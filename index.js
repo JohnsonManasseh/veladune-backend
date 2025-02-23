@@ -5,7 +5,6 @@ const bookingRoutes = require("./routes/bookings");
 const cors = require("cors"); // Import cors package
 
 const multer = require("multer");
-const twilio = require("twilio");
 
 dotenv.config();
 
