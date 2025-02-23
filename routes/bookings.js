@@ -45,9 +45,9 @@ router.post("/addbooking", async (req, res) => {
     if (!gender) missingFields.push("gender");
     if (!email) missingFields.push("email");
     if (!phoneNumber) missingFields.push("phoneNumber");
-    if (!adults) missingFields.push("adults");
-    if (!childrens) missingFields.push("childrens");
-    if (!infants) missingFields.push("infants");
+    if (adults === "") missingFields.push("adults");
+    if (childrens === "") missingFields.push("childrens");
+    if (infants === "") missingFields.push("infants");
     if (!address) missingFields.push("address");
 
     if (missingFields.length > 0) {
