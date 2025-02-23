@@ -499,7 +499,24 @@ router.post("/verify-otp", async (req, res) => {
       .services("VA27352c51f42e56bb9b687b1f14eff45e")
       .verificationChecks.create({ to: phoneNumber, code });
     if (verificationCheck.status === "approved") {
-      res.status(200).send({ message: "Phone number verified successfully!" });
+      let user = await User.findOne({ phoneNumber });
+
+      if (!user) {
+        user = new User({ phoneNumber });
+        await user.save();
+      }
+
+      const token = jwt.sign(
+        { userId: user._id, phoneNumber: user.phoneNumber },
+        "YOUR_SECRET_KEY",
+        { expiresIn: "7d" }
+      );
+
+      return res.status(200).json({
+        message: "Phone number verified successfully!",
+        token,
+        user,
+      });
     } else {
       res.status(400).send({ error: "Invalid OTP" });
     }
