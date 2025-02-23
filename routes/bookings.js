@@ -484,7 +484,7 @@ router.post("/send-otp", async (req, res) => {
   const { phoneNumber } = req.body;
   try {
     const verification = await client.verify
-      .services("ACb6cc4abbd82df53d9a43ee6add878ebd")
+      .services("SK8c1f9c04d6da8d64dc3d7c77a820c39d")
       .verifications.create({ to: phoneNumber, channel: "sms" });
     res.status(200).send({ message: "OTP sent successfully!" });
   } catch (error) {
@@ -496,7 +496,7 @@ router.post("/verify-otp", async (req, res) => {
   const { phoneNumber, code } = req.body;
   try {
     const verificationCheck = await client.verify
-      .services("ACb6cc4abbd82df53d9a43ee6add878ebd")
+      .services("SK8c1f9c04d6da8d64dc3d7c77a820c39d")
       .verificationChecks.create({ to: phoneNumber, code });
     if (verificationCheck.status === "approved") {
       res.status(200).send({ message: "Phone number verified successfully!" });
