@@ -302,9 +302,25 @@ router.put("/updateroom", async (req, res) => {
 
 router.post("/register", async (req, res) => {
   try {
-    const { firstName, lastName, email, password, phoneNumber } = req.body;
+    const {
+      firstName,
+      lastName,
+      email,
+      password,
+      phoneNumber,
+      gender,
+      address,
+    } = req.body;
 
-    if (!firstName || !lastName || !email || !password || !phoneNumber) {
+    if (
+      !firstName ||
+      !lastName ||
+      !email ||
+      !password ||
+      !phoneNumber ||
+      !gender ||
+      !address
+    ) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
@@ -324,6 +340,8 @@ router.post("/register", async (req, res) => {
       email,
       password: hashedPassword,
       phoneNumber,
+      gender,
+      address,
     });
 
     await newUser.save();
@@ -510,8 +528,8 @@ router.post("/verify-otp", async (req, res) => {
 
       const token = jwt.sign(
         { userId: user._id, phoneNumber: user.phoneNumber },
-        "YOUR_SECRET_KEY",
-        { expiresIn: "7d" }
+        JWT_SECRET,
+        { expiresIn: "1hr" }
       );
 
       return res.status(200).json({
