@@ -363,6 +363,57 @@ router.post("/register", async (req, res) => {
   }
 });
 
+router.post("/savedetails", async (req, res) => {
+  try {
+    const { firstName, lastName, email, phoneNumber, gender, address } =
+      req.body;
+
+    if (
+      !firstName ||
+      !lastName ||
+      !email ||
+      !phoneNumber ||
+      !gender ||
+      !address
+    ) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res
+        .status(400)
+        .json({ message: "User already exists please login" });
+    }
+
+    const newUser = new User({
+      firstName,
+      lastName,
+      email,
+      phoneNumber,
+      gender,
+      address,
+    });
+
+    await newUser.save();
+    const token = jwt.sign(
+      { userId: newUser._id, userName: newUser.userName },
+      JWT_SECRET,
+      {
+        expiresIn: "1hr",
+      }
+    );
+    res
+      .status(201)
+      .json({ token, userId: newUser._id, message: "Registered successfully" });
+  } catch (err) {
+    console.error("Error creating booking:", err);
+    res
+      .status(500)
+      .json({ message: "Failed to register please try again later" });
+  }
+});
+
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
