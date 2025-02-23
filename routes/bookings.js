@@ -8,8 +8,8 @@ const router = express.Router();
 const bcrypt = require("bcryptjs");
 const twilio = require("twilio");
 const client = twilio(
-  "AC732aa520e5ae161e34c95b770dd06fbe",
-  "5fe75ed1e11fe221edd34f118b9ca577"
+  "ACb6cc4abbd82df53d9a43ee6add878ebd",
+  "672c9d70fb1503bc3e2cb71dfa40ec5e"
 );
 
 router.post("/addbooking", async (req, res) => {
@@ -484,7 +484,7 @@ router.post("/send-otp", async (req, res) => {
   const { phoneNumber } = req.body;
   try {
     const verification = await client.verify
-      .services("AC732aa520e5ae161e34c95b770dd06fbe")
+      .services("ACb6cc4abbd82df53d9a43ee6add878ebd")
       .verifications.create({ to: phoneNumber, channel: "sms" });
     res.status(200).send({ message: "OTP sent successfully!" });
   } catch (error) {
@@ -496,7 +496,7 @@ router.post("/verify-otp", async (req, res) => {
   const { phoneNumber, code } = req.body;
   try {
     const verificationCheck = await client.verify
-      .services("AC732aa520e5ae161e34c95b770dd06fbe")
+      .services("ACb6cc4abbd82df53d9a43ee6add878ebd")
       .verificationChecks.create({ to: phoneNumber, code });
     if (verificationCheck.status === "approved") {
       res.status(200).send({ message: "Phone number verified successfully!" });
