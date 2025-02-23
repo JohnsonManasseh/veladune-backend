@@ -302,9 +302,9 @@ router.put("/updateroom", async (req, res) => {
 
 router.post("/register", async (req, res) => {
   try {
-    const { userName, email, password, phoneNumber } = req.body;
+    const { firstName, lastName, email, password, phoneNumber } = req.body;
 
-    if (!userName || !email || !password || !phoneNumber) {
+    if (!firstName || !lastName || !email || !password || !phoneNumber) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
@@ -319,7 +319,8 @@ router.post("/register", async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, salt);
 
     const newUser = new User({
-      userName,
+      firstName,
+      lastName,
       email,
       password: hashedPassword,
       phoneNumber,
