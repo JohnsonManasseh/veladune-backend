@@ -302,9 +302,9 @@ router.put("/updateroom", async (req, res) => {
 
 router.post("/register", async (req, res) => {
   try {
-    const { userName, email, password } = req.body;
+    const { userName, email, password, phoneNumber } = req.body;
 
-    if (!userName || !email || !password) {
+    if (!userName || !email || !password || !phoneNumber) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
@@ -322,6 +322,7 @@ router.post("/register", async (req, res) => {
       userName,
       email,
       password: hashedPassword,
+      phoneNumber,
     });
 
     await newUser.save();
