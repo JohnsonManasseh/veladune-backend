@@ -475,4 +475,32 @@ router.delete("/deleteuser", async (req, res) => {
   }
 });
 
+router.post("/send-otp", async (req, res) => {
+  const { phoneNumber } = req.body;
+  try {
+    const verification = await client.verify
+      .services("AC732aa520e5ae161e34c95b770dd06fbe")
+      .verifications.create({ to: phoneNumber, channel: "sms" });
+    res.status(200).send({ message: "OTP sent successfully!" });
+  } catch (error) {
+    res.status(500).send({ error: error.message });
+  }
+});
+
+router.post("/verify-otp", async (req, res) => {
+  const { phoneNumber, code } = req.body;
+  try {
+    const verificationCheck = await client.verify
+      .services("AC732aa520e5ae161e34c95b770dd06fbe")
+      .verificationChecks.create({ to: phoneNumber, code });
+    if (verificationCheck.status === "approved") {
+      res.status(200).send({ message: "Phone number verified successfully!" });
+    } else {
+      res.status(400).send({ error: "Invalid OTP" });
+    }
+  } catch (error) {
+    res.status(500).send({ error: error.message });
+  }
+});
+
 module.exports = router;
