@@ -588,7 +588,7 @@ router.post("/verify-otp", async (req, res) => {
       );
 
       return res.status(200).json({
-        message: "Phone number verified successfully!",
+        message: "Loggedin successfully!",
         token,
         user,
       });
