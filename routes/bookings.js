@@ -557,9 +557,9 @@ router.post("/send-otp", async (req, res) => {
     let user = await User.findOne({ phoneNumber });
 
     if (!user) {
-      return res
-        .status(400)
-        .send({ error: "user not found, please signup or fill the details" });
+      return res.status(400).send({
+        error: "Oops! User not found. Sign up or fill in your details.",
+      });
     }
 
     const verification = await client.verify
