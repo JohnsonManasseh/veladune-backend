@@ -566,17 +566,17 @@ router.post("/send-otp", async (req, res) => {
 router.post("/verify-otp", async (req, res) => {
   const { phoneNumber, code } = req.body;
   try {
+    let user = await User.findOne({ phoneNumber });
+
+    if (!user) {
+      return res
+        .status(400)
+        .send({ error: "user not found, please signup or fill the details" });
+    }
     const verificationCheck = await client.verify
       .services("VA27352c51f42e56bb9b687b1f14eff45e")
       .verificationChecks.create({ to: phoneNumber, code });
     if (verificationCheck.status === "approved") {
-      let user = await User.findOne({ phoneNumber });
-
-      if (!user) {
-        user = new User({ phoneNumber });
-        await user.save();
-      }
-
       const token = jwt.sign(
         { userId: user._id, phoneNumber: user.phoneNumber },
         JWT_SECRET,
