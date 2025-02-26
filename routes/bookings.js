@@ -577,6 +577,9 @@ router.post("/verify-otp", async (req, res) => {
     const verificationCheck = await client.verify
       .services("VA27352c51f42e56bb9b687b1f14eff45e")
       .verificationChecks.create({ to: phoneNumber, code });
+
+    let user = await User.findOne({ phoneNumber });
+
     if (verificationCheck.status === "approved") {
       const token = jwt.sign(
         { userId: user._id, phoneNumber: user.phoneNumber },
