@@ -124,7 +124,7 @@ router.post("/addbooking", async (req, res) => {
     });
 
     const mailOptions = {
-      from: "your-email@yourdomain.com",
+      from: "info@veladune.com",
       to: email,
       subject: "Booking Confirmation - Resort Stay",
       html: `
