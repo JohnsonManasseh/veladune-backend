@@ -18,39 +18,53 @@ const puppeteer = require("puppeteer");
 
 const generateInvoicePdf = async (bookingDetails) => {
   const browser = await puppeteer.launch({
-    headless: "new", // Ensures headless mode works
-    args: [
-      "--no-sandbox",
-      "--disable-setuid-sandbox",
-      "--disable-dev-shm-usage",
-      "--single-process",
-      "--disable-gpu",
-    ],
-    executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || undefined, // Use correct path
+    args: chromium.args,
+    executablePath: await chromium.executablePath(), // Use correct Chromium path
+    headless: chromium.headless,
   });
-  const page = await browser.newPage();
 
-  const invoiceHTML = `
+  const page = await browser.newPage();
+  await page.setContent(`
     <html>
-      <body style="font-family: Arial, sans-serif; padding: 20px;">
-        <h2 style="color: #333;">Booking Invoice</h2>
-        <p><strong>Customer Name:</strong> ${bookingDetails.firstName}${bookingDetails.lastName}</p>
-        <p><strong>Check-in Date:</strong> ${bookingDetails.checkInDate}</p>
-        <p><strong>Check-out Date:</strong> ${bookingDetails.checkOutDate}</p>
-        <p><strong>Room ID:</strong> ${bookingDetails.roomId}</p>
-        <p><strong>Amount:</strong> $XXX</p>
-        <hr>
-        <p>Thank you for booking with us!</p>
+      <body>
+        <h2>Invoice for ${bookingDetails.firstName}${bookingDetails.lastName}</h2>
+        <p>Check-in: ${bookingDetails.checkInDate}</p>
+        <p>Check-out: ${bookingDetails.checkOutDate}</p>
+        <p>Room ID: ${bookingDetails.roomId}</p>
+        <p>Amount: $XXX</p>
       </body>
     </html>
-  `;
+  `);
 
-  await page.setContent(invoiceHTML);
-  const pdfPath = path.join(__dirname, `invoice_${bookingDetails.userId}.pdf`);
+  const pdfPath = `/tmp/invoice_${bookingDetails.userId}.pdf`;
   await page.pdf({ path: pdfPath, format: "A4" });
 
   await browser.close();
   return pdfPath;
+
+  // const page = await browser.newPage();
+
+  // const invoiceHTML = `
+  //   <html>
+  //     <body style="font-family: Arial, sans-serif; padding: 20px;">
+  //       <h2 style="color: #333;">Booking Invoice</h2>
+  //       <p><strong>Customer Name:</strong> ${bookingDetails.firstName}${bookingDetails.lastName}</p>
+  //       <p><strong>Check-in Date:</strong> ${bookingDetails.checkInDate}</p>
+  //       <p><strong>Check-out Date:</strong> ${bookingDetails.checkOutDate}</p>
+  //       <p><strong>Room ID:</strong> ${bookingDetails.roomId}</p>
+  //       <p><strong>Amount:</strong> $XXX</p>
+  //       <hr>
+  //       <p>Thank you for booking with us!</p>
+  //     </body>
+  //   </html>
+  // `;
+
+  // await page.setContent(invoiceHTML);
+  // const pdfPath = path.join(__dirname, `invoice_${bookingDetails.userId}.pdf`);
+  // await page.pdf({ path: pdfPath, format: "A4" });
+
+  // await browser.close();
+  // return pdfPath;
 };
 
 router.post("/addbooking", async (req, res) => {
