@@ -92,7 +92,6 @@ router.post("/addbooking", async (req, res) => {
     }
 
     const newBooking = new Booking({
-      customerName,
       checkInDate,
       checkOutDate,
       userId,
