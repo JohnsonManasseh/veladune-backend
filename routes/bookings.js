@@ -12,6 +12,36 @@ const client = twilio(
   "672c9d70fb1503bc3e2cb71dfa40ec5e"
 );
 const nodemailer = require("nodemailer");
+const fs = require("fs");
+const path = require("path");
+const puppeteer = require("puppeteer");
+
+const generateInvoicePdf = async (bookingDetails) => {
+  const browser = await puppeteer.launch();
+  const page = await browser.newPage();
+
+  const invoiceHTML = `
+    <html>
+      <body style="font-family: Arial, sans-serif; padding: 20px;">
+        <h2 style="color: #333;">Booking Invoice</h2>
+        <p><strong>Customer Name:</strong> ${bookingDetails.firstName}${bookingDetails.secondName}</p>
+        <p><strong>Check-in Date:</strong> ${bookingDetails.checkInDate}</p>
+        <p><strong>Check-out Date:</strong> ${bookingDetails.checkOutDate}</p>
+        <p><strong>Room ID:</strong> ${bookingDetails.roomId}</p>
+        <p><strong>Amount:</strong> $XXX</p>
+        <hr>
+        <p>Thank you for booking with us!</p>
+      </body>
+    </html>
+  `;
+
+  await page.setContent(invoiceHTML);
+  const pdfPath = path.join(__dirname, `invoice_${bookingDetails.userId}.pdf`);
+  await page.pdf({ path: pdfPath, format: "A4" });
+
+  await browser.close();
+  return pdfPath;
+};
 
 router.post("/addbooking", async (req, res) => {
   try {
@@ -112,6 +142,14 @@ router.post("/addbooking", async (req, res) => {
     await room.save();
 
     await newBooking.save();
+    const pdfPath = await generateInvoicePdf({
+      firstName,
+      lastName,
+      checkInDate,
+      checkOutDate,
+      userId,
+      roomId,
+    });
 
     const transporter = nodemailer.createTransport({
       host: "smtpout.secureserver.net",
@@ -144,6 +182,13 @@ router.post("/addbooking", async (req, res) => {
     <p>We look forward to your stay!</p>
     <p>Thank you for choosing us.</p>
   `,
+      attachments: [
+        {
+          filename: "invoice.pdf",
+          path: pdfPath,
+          contentType: "application/pdf",
+        },
+      ],
     };
 
     transporter.sendMail(mailOptions, (error, info) => {
