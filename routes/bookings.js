@@ -17,7 +17,10 @@ const path = require("path");
 const puppeteer = require("puppeteer");
 
 const generateInvoicePdf = async (bookingDetails) => {
-  const browser = await puppeteer.launch();
+  const browser = await puppeteer.launch({
+    headless: true,
+    args: ["--no-sandbox", "--disable-setuid-sandbox"],
+  });
   const page = await browser.newPage();
 
   const invoiceHTML = `
