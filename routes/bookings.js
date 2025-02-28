@@ -11,6 +11,7 @@ const client = twilio(
   "ACb6cc4abbd82df53d9a43ee6add878ebd",
   "672c9d70fb1503bc3e2cb71dfa40ec5e"
 );
+const nodemailer = require("nodemailer");
 
 router.post("/addbooking", async (req, res) => {
   try {
@@ -112,6 +113,48 @@ router.post("/addbooking", async (req, res) => {
     await room.save();
 
     await newBooking.save();
+
+    const transporter = nodemailer.createTransport({
+      host: "smtpout.secureserver.net",
+      port: 465,
+      secure: true,
+      auth: {
+        user: "info@veladune.com",
+        pass: "21596rocker",
+      },
+    });
+
+    const mailOptions = {
+      from: "your-email@yourdomain.com",
+      to: email,
+      subject: "Booking Confirmation - Resort Stay",
+      html: `
+    <h2>Booking Confirmed!</h2>
+    <p>Dear ${firstName} ${lastName},</p>
+    <p>We are pleased to confirm your booking at our resort.</p>
+    <h3>Booking Details:</h3>
+    <ul>
+      <li><strong>Check-in Date:</strong> ${checkInDate}</li>
+      <li><strong>Check-out Date:</strong> ${checkOutDate}</li>
+      <li><strong>Room ID:</strong> ${roomId}</li>
+      <li><strong>Adults:</strong> ${adults}</li>
+      <li><strong>Children:</strong> ${childrens}</li>
+      <li><strong>Infants:</strong> ${infants}</li>
+      <li><strong>Address:</strong> ${address}</li>
+    </ul>
+    <p>We look forward to your stay!</p>
+    <p>Thank you for choosing us.</p>
+  `,
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.log("Error sending email:", error);
+      } else {
+        console.log("Email sent:", info.response);
+      }
+    });
+
     res.status(201).json({ newBooking, message: "Your booking is reserved" });
   } catch (err) {
     console.error("Error creating booking:", err);
