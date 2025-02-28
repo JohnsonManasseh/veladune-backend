@@ -24,7 +24,7 @@ const generateInvoicePdf = async (bookingDetails) => {
     <html>
       <body style="font-family: Arial, sans-serif; padding: 20px;">
         <h2 style="color: #333;">Booking Invoice</h2>
-        <p><strong>Customer Name:</strong> ${bookingDetails.firstName}${bookingDetails.secondName}</p>
+        <p><strong>Customer Name:</strong> ${bookingDetails.firstName}${bookingDetails.lastName}</p>
         <p><strong>Check-in Date:</strong> ${bookingDetails.checkInDate}</p>
         <p><strong>Check-out Date:</strong> ${bookingDetails.checkOutDate}</p>
         <p><strong>Room ID:</strong> ${bookingDetails.roomId}</p>
@@ -46,7 +46,6 @@ const generateInvoicePdf = async (bookingDetails) => {
 router.post("/addbooking", async (req, res) => {
   try {
     const {
-      customerName,
       checkInDate,
       checkOutDate,
       status,
@@ -65,7 +64,6 @@ router.post("/addbooking", async (req, res) => {
 
     const missingFields = [];
 
-    if (!customerName) missingFields.push("customerName");
     if (!checkInDate) missingFields.push("checkInDate");
     if (!checkOutDate) missingFields.push("checkOutDate");
     if (!status) missingFields.push("status");
