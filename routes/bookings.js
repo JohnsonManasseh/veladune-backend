@@ -15,6 +15,7 @@ const nodemailer = require("nodemailer");
 const fs = require("fs");
 const path = require("path");
 const puppeteer = require("puppeteer");
+const chromium = require("@sparticuz/chromium");
 
 const generateInvoicePdf = async (bookingDetails) => {
   const browser = await puppeteer.launch({
