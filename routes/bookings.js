@@ -15,20 +15,31 @@ const nodemailer = require("nodemailer");
 const fs = require("fs");
 const path = require("path");
 const puppeteer = require("puppeteer");
-const chromium = require("@sparticuz/chromium");
+// const chromium = require("@sparticuz/chromium");
+const { chromium } = require("playwright");
+
+// (async () => {
+//   const browser = await puppeteer.launch({
+//     executablePath:
+//       "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe", // Adjust if needed
+
+//     headless: true,
+//     args: ["--no-sandbox", "--disable-setuid-sandbox"],
+//   });
+
+//   const page = await browser.newPage();
+//   await page.goto("https://example.com");
+//   await browser.close();
+// })();
 
 const generateInvoicePdf = async (bookingDetails) => {
-  const browser = await puppeteer.launch({
-    args: chromium.args,
-    executablePath: await chromium.executablePath(), // Use correct Chromium path
-    headless: chromium.headless,
-  });
-
+  const browser = await chromium.launch(); // Launch headless browser
   const page = await browser.newPage();
+
   await page.setContent(`
     <html>
       <body>
-        <h2>Invoice for ${bookingDetails.firstName}${bookingDetails.lastName}</h2>
+        <h2>Invoice for ${bookingDetails.firstName} ${bookingDetails.lastName}</h2>
         <p>Check-in: ${bookingDetails.checkInDate}</p>
         <p>Check-out: ${bookingDetails.checkOutDate}</p>
         <p>Room ID: ${bookingDetails.roomId}</p>
@@ -42,30 +53,6 @@ const generateInvoicePdf = async (bookingDetails) => {
 
   await browser.close();
   return pdfPath;
-
-  // const page = await browser.newPage();
-
-  // const invoiceHTML = `
-  //   <html>
-  //     <body style="font-family: Arial, sans-serif; padding: 20px;">
-  //       <h2 style="color: #333;">Booking Invoice</h2>
-  //       <p><strong>Customer Name:</strong> ${bookingDetails.firstName}${bookingDetails.lastName}</p>
-  //       <p><strong>Check-in Date:</strong> ${bookingDetails.checkInDate}</p>
-  //       <p><strong>Check-out Date:</strong> ${bookingDetails.checkOutDate}</p>
-  //       <p><strong>Room ID:</strong> ${bookingDetails.roomId}</p>
-  //       <p><strong>Amount:</strong> $XXX</p>
-  //       <hr>
-  //       <p>Thank you for booking with us!</p>
-  //     </body>
-  //   </html>
-  // `;
-
-  // await page.setContent(invoiceHTML);
-  // const pdfPath = path.join(__dirname, `invoice_${bookingDetails.userId}.pdf`);
-  // await page.pdf({ path: pdfPath, format: "A4" });
-
-  // await browser.close();
-  // return pdfPath;
 };
 
 router.post("/addbooking", async (req, res) => {
