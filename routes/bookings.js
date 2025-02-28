@@ -16,7 +16,7 @@ const fs = require("fs");
 const path = require("path");
 const puppeteer = require("puppeteer");
 // const chromium = require("@sparticuz/chromium");
-const { chromium } = require("playwright");
+const chromium = require("@sparticuz/chromium");
 
 // (async () => {
 //   const browser = await puppeteer.launch({
@@ -33,9 +33,10 @@ const { chromium } = require("playwright");
 // })();
 
 const generateInvoicePdf = async (bookingDetails) => {
-  const browser = await chromium.launch({
-    headless: true, // Required for Vercel
-    args: ["--no-sandbox"], // Helps avoid permission issues
+  const browser = await puppeteer.launch({
+    args: chromium.args,
+    executablePath: await chromium.executablePath(),
+    headless: chromium.headless,
   });
   const page = await browser.newPage();
 
