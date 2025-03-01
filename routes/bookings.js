@@ -15,7 +15,8 @@ const nodemailer = require("nodemailer");
 const fs = require("fs");
 const path = require("path");
 const puppeteer = require("puppeteer-core");
-const { chromium } = require("playwright");
+const chromium = require("@sparticuz/chromium");
+const playwright = require("playwright-core");
 
 // (async () => {
 //   const browser = await puppeteer.launch({
@@ -32,25 +33,26 @@ const { chromium } = require("playwright");
 // })();
 
 const generateInvoicePdf = async (bookingDetails) => {
-  const browser = await chromium.launch({
-    headless: true, // Required for Vercel
-    args: ["--no-sandbox"], // Helps avoid permission issues
+  const browser = await playwright.chromium.launch({
+    headless: true, // Make sure it's a boolean
+    args: ["--no-sandbox"], // Avoid permission issues
   });
+
   const page = await browser.newPage();
 
   await page.setContent(`
-      <html>
-    <body style="font-family: Arial, sans-serif; padding: 20px;">
-      <h2 style="color: #333;">Booking Invoice</h2>
-    <p><strong>Customer Name:</strong> ${bookingDetails.firstName}${bookingDetails.lastName}</p>
-      <p><strong>Check-in Date:</strong> ${bookingDetails.checkInDate}</p>
-     <p><strong>Check-out Date:</strong> ${bookingDetails.checkOutDate}</p>
-      <p><strong>Room ID:</strong> ${bookingDetails.roomId}</p>
-      <p><strong>Amount:</strong> $XXX</p>
-       <hr>
-      <p>Thank you for booking with us!</p>
-    </body>
-   </html>
+    <html>
+      <body style="font-family: Arial, sans-serif; padding: 20px;">
+        <h2 style="color: #333;">Booking Invoice</h2>
+        <p><strong>Customer Name:</strong> ${bookingDetails.firstName} ${bookingDetails.lastName}</p>
+        <p><strong>Check-in Date:</strong> ${bookingDetails.checkInDate}</p>
+        <p><strong>Check-out Date:</strong> ${bookingDetails.checkOutDate}</p>
+        <p><strong>Room ID:</strong> ${bookingDetails.roomId}</p>
+        <p><strong>Amount:</strong> $XXX</p>
+        <hr>
+        <p>Thank you for booking with us!</p>
+      </body>
+    </html>
   `);
 
   const pdfBuffer = await page.pdf({ format: "A4" });
@@ -156,7 +158,7 @@ router.post("/addbooking", async (req, res) => {
     await room.save();
 
     await newBooking.save();
-    const pdfPath = await generateInvoicePdf({
+    const pdfBuffer = await generateInvoicePdf({
       firstName,
       lastName,
       checkInDate,
@@ -199,7 +201,7 @@ router.post("/addbooking", async (req, res) => {
       attachments: [
         {
           filename: "invoice.pdf",
-          path: pdfPath,
+          content: Buffer.from(pdfBuffer),
           contentType: "application/pdf",
         },
       ],
