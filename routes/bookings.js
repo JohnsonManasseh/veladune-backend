@@ -15,7 +15,7 @@ const nodemailer = require("nodemailer");
 const fs = require("fs");
 const path = require("path");
 const puppeteer = require("puppeteer-core");
-const chromium = require("@sparticuz/chromium");
+const { chromium } = require("playwright");
 
 // (async () => {
 //   const browser = await puppeteer.launch({
@@ -32,10 +32,9 @@ const chromium = require("@sparticuz/chromium");
 // })();
 
 const generateInvoicePdf = async (bookingDetails) => {
-  const browser = await puppeteer.launch({
-    args: chromium.args,
-    executablePath: await chromium.executablePath(),
-    headless: chromium.headless,
+  const browser = await chromium.launch({
+    headless: true, // Required for Vercel
+    args: ["--no-sandbox"], // Helps avoid permission issues
   });
   const page = await browser.newPage();
 
@@ -54,11 +53,10 @@ const generateInvoicePdf = async (bookingDetails) => {
    </html>
   `);
 
-  const pdfPath = `/tmp/invoice_${bookingDetails.userId}.pdf`;
-  await page.pdf({ path: pdfPath, format: "A4" });
+  const pdfBuffer = await page.pdf({ format: "A4" });
 
   await browser.close();
-  return pdfPath;
+  return pdfBuffer;
 };
 
 router.post("/addbooking", async (req, res) => {
