@@ -1,5 +1,6 @@
 const express = require("express");
 const mongoose = require("mongoose");
+require("dotenv").config();
 const dotenv = require("dotenv");
 const bookingRoutes = require("./routes/bookings");
 const cors = require("cors"); // Import cors package
