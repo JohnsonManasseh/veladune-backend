@@ -12,11 +12,7 @@ const client = twilio(
   "672c9d70fb1503bc3e2cb71dfa40ec5e"
 );
 const nodemailer = require("nodemailer");
-const fs = require("fs");
-const path = require("path");
-const puppeteer = require("puppeteer-core");
-// const chromium = require("@sparticuz/chromium");
-const playwright = require("playwright-core");
+const { chromium } = require("playwright");
 
 // (async () => {
 //   const browser = await puppeteer.launch({
@@ -33,7 +29,8 @@ const playwright = require("playwright-core");
 // })();
 
 const generateInvoicePdf = async (bookingDetails) => {
-  const browser = await playwright.chromium.launch({
+  const browser = await chromium.launch();
+  ({
     headless: true, // Required for serverless environments
     args: ["--no-sandbox", "--disable-setuid-sandbox"], // Avoid permission issues
   });
