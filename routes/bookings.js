@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const Booking = require("../models/booking");
 const jwt = require("jsonwebtoken");
