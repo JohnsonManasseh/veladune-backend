@@ -15,7 +15,7 @@ const nodemailer = require("nodemailer");
 const fs = require("fs");
 const path = require("path");
 const puppeteer = require("puppeteer-core");
-const chromium = require("@sparticuz/chromium");
+// const chromium = require("@sparticuz/chromium");
 const playwright = require("playwright-core");
 
 // (async () => {
@@ -34,8 +34,8 @@ const playwright = require("playwright-core");
 
 const generateInvoicePdf = async (bookingDetails) => {
   const browser = await playwright.chromium.launch({
-    headless: true, // Make sure it's a boolean
-    args: ["--no-sandbox"], // Avoid permission issues
+    headless: true, // Required for serverless environments
+    args: ["--no-sandbox", "--disable-setuid-sandbox"], // Avoid permission issues
   });
 
   const page = await browser.newPage();
