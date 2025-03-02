@@ -256,13 +256,6 @@ router.post("/addbooking", async (req, res) => {
     <p style="font-size: 16px; color: #555; text-align: center; font-weight: bold;">Regards,<br>Johnson</p>
   </div>
 `,
-      attachments: [
-        {
-          filename: `Invoice_${roomId}.pdf`,
-          content: pdfBuffer, // Your generated PDF buffer
-          contentType: "application/pdf",
-        },
-      ],
 
       attachments: [
         {
