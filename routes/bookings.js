@@ -241,13 +241,13 @@ router.post("/addbooking", async (req, res) => {
   </p>
 
   <p style="text-align: left;">
-    <a href="https://yourresort.com" style="display: inline-block; padding: 10px 20px; font-size: 16px; background-color: #000; color: white; text-decoration: none;">View Booking</a>
+    <a href="https://veladune.com" style="display: inline-block; padding: 10px 20px; font-size: 16px; background-color: #153D4B; color: white; text-decoration: none;">View Booking</a>
   </p>
 
   <h3 style="color: #000; text-align: left; margin-top: 20px;">Contact Us</h3>
   <p style="font-size: 14px; color: #000; text-align: left;">
     Kodaikanal <br>
-    Email: <a href="mailto:support@veladune.com" style="color: #000;">support@veladune.com</a> <br>
+    Email: <a href="mailto:info@veladune.com" style="color: #000;">info@veladune.com</a> <br>
     Phone: <a href="tel:+1234567890" style="color: #000;">+1 234 567 890</a>
   </p>
 
