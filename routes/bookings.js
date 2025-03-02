@@ -202,7 +202,7 @@ router.post("/addbooking", async (req, res) => {
     <h2 style="color: #2c3e50; text-align: center;">🌟 Booking Confirmed! 🌟</h2>
     
     <p style="font-size: 16px; color: #444; text-align: center;">Dear <strong>${firstName} ${lastName}</strong>,</p>
-    <p style="font-size: 16px; color: #555; text-align: center;">We are delighted to confirm your stay at <strong>${resortName}</strong>, where luxury meets serenity.</p>
+    <p style="font-size: 16px; color: #555; text-align: center;">We are delighted to confirm your stay at <strong>Veladune</strong>, where luxury meets serenity.</p>
 
     <div style="background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);">
       <h3 style="color: #34495e; text-align: center;">🏨 Booking Details</h3>
@@ -235,9 +235,9 @@ router.post("/addbooking", async (req, res) => {
       For your convenience, we have attached your **booking invoice** to this email. Please review the details and let us know if you have any questions.
     </p>
 
-    <h3 style="color: #34495e; text-align: center; margin-top: 20px;">🌴 About ${resortName}</h3>
+    <h3 style="color: #34495e; text-align: center; margin-top: 20px;">🌴 About Veladune</h3>
     <p style="font-size: 16px; color: #555; text-align: center;">
-      ${resortName} is a premier luxury resort offering world-class amenities, breathtaking views, and an unforgettable experience. Enjoy fine dining, spa treatments, and personalized services during your stay.
+      Veladune is a premier luxury resort offering world-class amenities, breathtaking views, and an unforgettable experience. Enjoy fine dining, spa treatments, and personalized services during your stay.
     </p>
 
     <p style="text-align: center;">
@@ -247,8 +247,8 @@ router.post("/addbooking", async (req, res) => {
     <div style="text-align: center; margin-top: 20px;">
       <h3 style="color: #34495e;">📞 Contact Us</h3>
       <p style="font-size: 14px; color: #777;">
-        📍 ${resortLocation} <br>
-        📧 <a href="mailto:support@yourresort.com" style="color: #2980b9;">support@yourresort.com</a> <br>
+        📍 Kodaikanal <br>
+        📧 <a href="mailto:support@yourresort.com" style="color: #2980b9;">support@veladune.com</a> <br>
         📞 <a href="tel:+1234567890" style="color: #2980b9;">+1 234 567 890</a>
       </p>
     </div>
