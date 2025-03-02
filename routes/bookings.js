@@ -5,7 +5,6 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 const Room = require("../models/rooms");
 const JWT_SECRET = process.env.JWT_SECRET;
-console.log("JWT_SECRET:", process.env.JWT_SECRET);
 
 const router = express.Router();
 const bcrypt = require("bcryptjs");
@@ -181,23 +180,90 @@ router.post("/addbooking", async (req, res) => {
       from: "info@veladune.com",
       to: email,
       subject: "Booking Confirmation - Resort Stay",
+      //     html: `
+      //   <h2>Booking Confirmed!</h2>
+      //   <p>Dear ${firstName} ${lastName},</p>
+      //   <p>We are pleased to confirm your booking at our resort.</p>
+      //   <h3>Booking Details:</h3>
+      //   <ul>
+      //     <li><strong>Check-in Date:</strong> ${checkInDate}</li>
+      //     <li><strong>Check-out Date:</strong> ${checkOutDate}</li>
+      //     <li><strong>Room ID:</strong> ${roomId}</li>
+      //     <li><strong>Adults:</strong> ${adults}</li>
+      //     <li><strong>Children:</strong> ${childrens}</li>
+      //     <li><strong>Infants:</strong> ${infants}</li>
+      //     <li><strong>Address:</strong> ${address}</li>
+      //   </ul>
+      //   <p>We look forward to your stay!</p>
+      //   <p>Thank you for choosing us.</p>
+      // `,
       html: `
-    <h2>Booking Confirmed!</h2>
-    <p>Dear ${firstName} ${lastName},</p>
-    <p>We are pleased to confirm your booking at our resort.</p>
-    <h3>Booking Details:</h3>
-    <ul>
-      <li><strong>Check-in Date:</strong> ${checkInDate}</li>
-      <li><strong>Check-out Date:</strong> ${checkOutDate}</li>
-      <li><strong>Room ID:</strong> ${roomId}</li>
-      <li><strong>Adults:</strong> ${adults}</li>
-      <li><strong>Children:</strong> ${childrens}</li>
-      <li><strong>Infants:</strong> ${infants}</li>
-      <li><strong>Address:</strong> ${address}</li>
-    </ul>
-    <p>We look forward to your stay!</p>
-    <p>Thank you for choosing us.</p>
-  `,
+  <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px; background-color: #f9f9f9;">
+    <h2 style="color: #2c3e50; text-align: center;">🌟 Booking Confirmed! 🌟</h2>
+    
+    <p style="font-size: 16px; color: #444; text-align: center;">Dear <strong>${firstName} ${lastName}</strong>,</p>
+    <p style="font-size: 16px; color: #555; text-align: center;">We are delighted to confirm your stay at <strong>${resortName}</strong>, where luxury meets serenity.</p>
+
+    <div style="background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);">
+      <h3 style="color: #34495e; text-align: center;">🏨 Booking Details</h3>
+      <table style="width: 100%; border-collapse: collapse; font-size: 16px; color: #555;">
+        <tr>
+          <td style="padding: 8px; font-weight: bold;">📅 Check-in Date:</td>
+          <td style="padding: 8px;">${checkInDate}</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px; font-weight: bold;">📅 Check-out Date:</td>
+          <td style="padding: 8px;">${checkOutDate}</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px; font-weight: bold;">🛏️ Room ID:</td>
+          <td style="padding: 8px;">${roomId}</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px; font-weight: bold;">👨‍👩‍👧‍👦 Guests:</td>
+          <td style="padding: 8px;">${adults} | ${childrens} | ${infants}</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px; font-weight: bold;">📍 Address:</td>
+          <td style="padding: 8px;">${address}</td>
+        </tr>
+      </table>
+    </div>
+
+    <h3 style="color: #34495e; text-align: center; margin-top: 20px;">📄 Invoice Attached</h3>
+    <p style="font-size: 16px; color: #555; text-align: center;">
+      For your convenience, we have attached your **booking invoice** to this email. Please review the details and let us know if you have any questions.
+    </p>
+
+    <h3 style="color: #34495e; text-align: center; margin-top: 20px;">🌴 About ${resortName}</h3>
+    <p style="font-size: 16px; color: #555; text-align: center;">
+      ${resortName} is a premier luxury resort offering world-class amenities, breathtaking views, and an unforgettable experience. Enjoy fine dining, spa treatments, and personalized services during your stay.
+    </p>
+
+    <p style="text-align: center;">
+      <a href="https://yourresort.com" style="display: inline-block; padding: 10px 20px; font-size: 16px; background-color: #2980b9; color: white; text-decoration: none; border-radius: 5px;">View Booking</a>
+    </p>
+
+    <div style="text-align: center; margin-top: 20px;">
+      <h3 style="color: #34495e;">📞 Contact Us</h3>
+      <p style="font-size: 14px; color: #777;">
+        📍 ${resortLocation} <br>
+        📧 <a href="mailto:support@yourresort.com" style="color: #2980b9;">support@yourresort.com</a> <br>
+        📞 <a href="tel:+1234567890" style="color: #2980b9;">+1 234 567 890</a>
+      </p>
+    </div>
+
+    <p style="font-size: 16px; color: #555; text-align: center; font-weight: bold;">Regards,<br>Johnson</p>
+  </div>
+`,
+      attachments: [
+        {
+          filename: `Invoice_${roomId}.pdf`,
+          content: pdfBuffer, // Your generated PDF buffer
+          contentType: "application/pdf",
+        },
+      ],
+
       attachments: [
         {
           filename: "invoice.pdf",
