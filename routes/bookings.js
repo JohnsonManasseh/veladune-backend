@@ -442,13 +442,14 @@ router.get("/rooms", async (req, res) => {
 
 router.put("/updateroom", async (req, res) => {
   try {
-    const { roomId, name, availability, price, bookings } = req.body;
+    const { roomId, name, availability, price, bookings, speed } = req.body;
 
     const updateFields = {};
     if (name) updateFields.name = name;
     if (availability) updateFields.availability = availability;
     if (price) updateFields.price = price;
     if (bookings) updateFields.bookings = bookings;
+    if (speed) updateFields.speed = speed;
 
     const updateRoom = await Room.findByIdAndUpdate(roomId, updateFields, {
       new: true,
@@ -711,6 +712,17 @@ router.delete("/deleteuser", async (req, res) => {
     res.status(500).json({ message: "Failed to delete user" });
   }
 });
+
+// const clearBookings = async (roomId) => {
+//   try {
+//     await Room.findByIdAndUpdate(roomId, { $set: { bookings: [] } });
+//     console.log("Bookings cleared successfully");
+//   } catch (error) {
+//     console.error("Error clearing bookings:", error);
+//   }
+// };
+
+// clearBookings("6795c21af44b32e98199cd81");
 
 router.post("/send-otp", async (req, res) => {
   const { phoneNumber } = req.body;

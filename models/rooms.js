@@ -15,6 +15,10 @@ const roomSchema = new mongoose.Schema(
       type: String,
       default: true,
     },
+    speed: {
+      type: Number,
+      default: true,
+    },
     bookings: [
       {
         checkInDate: {
