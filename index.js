@@ -21,7 +21,7 @@ app.use(cors(corsOptions));
 const upload = multer();
 app.use(upload.none());
 app.use(express.json());
-app.use("/api/v1/", bookingRoutes);
+app.use("/v1/", bookingRoutes);
 
 const uri = process.env.MONGO_URI;
 mongoose
