@@ -773,4 +773,27 @@ router.post("/verify-otp", async (req, res) => {
   }
 });
 
+const razorpay = new Razorpay({
+  key_id: "rzp_test_ZlmlnOavXd7ZJ3",
+  key_secret: "5qTR0TR9prVoyHHkmyFGhkVf",
+});
+
+router.post("/createorder", async (req, res) => {
+  const { amount } = req.body;
+
+  const options = {
+    amount: amount * 100,
+    currency: "INR",
+    receipt: `receipt_${Date.now()}`,
+  };
+
+  try {
+    const order = await razorpay.orders.create(options);
+    res.status(200).json(order);
+  } catch (error) {
+    console.error("Error creating order:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 module.exports = router;
