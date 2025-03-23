@@ -27,6 +27,7 @@
     "nodemailer": "^6.10.0",
     "nodemon": "^3.1.9",
     "playwright": "^1.50.1",
+    "razorpay": "^2.9.6",
     "twilio": "^5.4.5"
   },
   "devDependencies": {
