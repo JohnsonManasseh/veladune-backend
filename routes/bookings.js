@@ -638,6 +638,7 @@ router.post("/userdetails", async (req, res) => {
       return res.status(400).json({ message: "User not found" });
     }
     const bookings = await Booking.findOne({ email: email });
+    console.log("bookings", bookings);
     res.status(200).json({
       user,
       address: bookings.length > 0 ? bookings[0].address : null,
