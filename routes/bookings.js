@@ -161,10 +161,11 @@ router.post("/addbooking", async (req, res) => {
     room.availability = false;
     room.bookings.push({ checkInDate, checkOutDate });
     await room.save();
+    await newBooking.save();
     // if (!user.bookings) {
     //   user.bookings = [];
     // }
-    // await newBooking.save();
+
     // user.bookings.push(newBooking);
     // await user.save();
 
