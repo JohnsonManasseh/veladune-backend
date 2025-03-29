@@ -406,6 +406,33 @@ router.put("/updatebooking", async (req, res) => {
   }
 });
 
+router.post("/userdetails", async (req, res) => {
+  try {
+    const { id } = req.body;
+
+    if (!id) {
+      return res.status(400).json({ message: "User not found" });
+    }
+
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(400).json({ message: "User not found" });
+    }
+    const bookings = await Booking.findOne(id);
+    console.log("bookings", bookings);
+    res.status(200).json({
+      user,
+      address: bookings.length > 0 ? bookings[0].address : null,
+
+      bookings,
+      message: "User details found",
+    });
+  } catch (err) {
+    console.error("Error finding details", err);
+    res.status(500).json({ message: "Failed to find user" });
+  }
+});
+
 router.get("/bookings", async (req, res) => {
   try {
     const bookings = await Booking.find();
@@ -622,33 +649,6 @@ router.post("/login", async (req, res) => {
   } catch (err) {
     console.error("Error creating booking:", err);
     res.status(500).json({ message: "Failed to login" });
-  }
-});
-
-router.post("/userdetails", async (req, res) => {
-  try {
-    const { email } = req.body;
-
-    if (!email) {
-      return res.status(400).json({ message: "User not found" });
-    }
-
-    const user = await User.findOne({ email: email });
-    if (!user) {
-      return res.status(400).json({ message: "User not found" });
-    }
-    const bookings = await Booking.findOne({ email: email });
-    console.log("bookings", bookings);
-    res.status(200).json({
-      user,
-      address: bookings.length > 0 ? bookings[0].address : null,
-
-      bookings,
-      message: "User details found",
-    });
-  } catch (err) {
-    console.error("Error finding details", err);
-    res.status(500).json({ message: "Failed to find user" });
   }
 });
 
