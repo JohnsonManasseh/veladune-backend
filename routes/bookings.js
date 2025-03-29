@@ -416,11 +416,11 @@ router.post("/userdetails", async (req, res) => {
       return res.status(400).json({ message: "User not found" });
     }
 
-    const user = await User.find({ email });
+    const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json({ message: "User not found" });
     }
-    const bookings = await Booking.findOne({ email });
+    const bookings = await Booking.find({ email });
 
     console.log("bookings", bookings);
     res.status(200).json({
