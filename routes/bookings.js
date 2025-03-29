@@ -107,7 +107,7 @@ router.post("/addbooking", async (req, res) => {
     // if (!user) {
     //   return res.status(400).json({ message: "User not found" });
     // }
-    const room = await Room.findOne({ roomName: roomName });
+    const room = await Room.findOne({ name: roomName });
     console.log("room", room);
     if (!room) {
       return res.status(400).json({ message: "Room not found" });
