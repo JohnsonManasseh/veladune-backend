@@ -111,7 +111,7 @@ router.post("/addbooking", async (req, res) => {
     if (!room) {
       return res.status(400).json({ message: "Room not found" });
     }
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email: email });
     if (!user) {
       return res.status(400).json({ message: "User not found" });
     }
@@ -160,7 +160,9 @@ router.post("/addbooking", async (req, res) => {
     room.availability = false;
     room.bookings.push({ checkInDate, checkOutDate });
     await room.save();
-
+    if (!user.bookings) {
+      user.bookings = [];
+    }
     await newBooking.save();
     user.bookings.push(newBooking);
     await user.save();
