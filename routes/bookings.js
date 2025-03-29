@@ -111,10 +111,10 @@ router.post("/addbooking", async (req, res) => {
     if (!room) {
       return res.status(400).json({ message: "Room not found" });
     }
-    const user = await User.findOne({ email: email });
-    if (!user) {
-      return res.status(400).json({ message: "User not found" });
-    }
+    // const user = await User.findOne({ email: email });
+    // if (!user) {
+    //   return res.status(400).json({ message: "User not found" });
+    // }
 
     const checkRoomAvailable = room?.bookings?.some((b) => {
       const existingCheckInDate = new Date(b.checkInDate);
@@ -160,11 +160,11 @@ router.post("/addbooking", async (req, res) => {
     room.availability = false;
     room.bookings.push({ checkInDate, checkOutDate });
     await room.save();
-    if (!user.bookings) {
-      user.bookings = [];
-    }
-    await newBooking.save();
-    user.bookings.push(newBooking);
+    // if (!user.bookings) {
+    //   user.bookings = [];
+    // }
+    // await newBooking.save();
+    // user.bookings.push(newBooking);
     await user.save();
 
     const pdfBuffer = await generateInvoicePdf({
@@ -627,17 +627,17 @@ router.post("/login", async (req, res) => {
 
 router.post("/userdetails", async (req, res) => {
   try {
-    const { id } = req.body;
+    const { email } = req.body;
 
-    if (!id) {
+    if (!email) {
       return res.status(400).json({ message: "User not found" });
     }
 
-    const user = await User.findById(id);
+    const user = await User.findOne({ email: email });
     if (!user) {
       return res.status(400).json({ message: "User not found" });
     }
-    const bookings = await Booking.find({ userId: id });
+    const bookings = await Booking.find({ email: email });
     res.status(200).json({
       user,
       address: bookings.length > 0 ? bookings[0].address : null,
