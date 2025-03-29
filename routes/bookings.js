@@ -294,13 +294,13 @@ router.post("/addbooking", async (req, res) => {
 
 router.put("/updatebooking", async (req, res) => {
   try {
-    const { bookingId, checkInDate, checkOutDate, action, roomId } = req.body;
+    const { bookingId, checkInDate, checkOutDate, action, roomName } = req.body;
 
     if (!bookingId) {
       return res.status(400).json({ message: "Booking id is required" });
     }
-    if (!roomId) {
-      return res.status(400).json({ message: "Room id is required" });
+    if (!roomName) {
+      return res.status(400).json({ message: "room name is required" });
     }
     if (!checkInDate && !checkOutDate && !action) {
       return res
@@ -308,8 +308,8 @@ router.put("/updatebooking", async (req, res) => {
         .json({ message: "either check in - out date or action is required" });
     }
     if (
-      (checkInDate && !checkOutDate && roomId) ||
-      (!checkInDate && checkOutDate && roomId)
+      (checkInDate && !checkOutDate && roomName) ||
+      (!checkInDate && checkOutDate && roomName)
     ) {
       return res.status(400).json({
         message:
@@ -318,8 +318,8 @@ router.put("/updatebooking", async (req, res) => {
     }
 
     if (
-      (action && checkInDate && roomId) ||
-      (action && checkOutDate && roomId)
+      (action && checkInDate && roomName) ||
+      (action && checkOutDate && roomName)
     ) {
       return res.status(400).json({
         message:
@@ -327,7 +327,7 @@ router.put("/updatebooking", async (req, res) => {
       });
     }
 
-    const room = await Room.findById(roomId);
+    const room = await Room.findOne({ name: roomName });
     const booking = await Booking.findById(bookingId);
     if (action === "cancel") {
       room.availability = true;
