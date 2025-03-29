@@ -736,7 +736,18 @@ router.delete("/deleteuser", async (req, res) => {
 //   }
 // };
 
-// clearBookings("6795c21af44b32e98199cd81");
+// clearBookings("6794d937e81be69386b8e88b");
+
+// const deleteBookingsForUser = async (email) => {
+//   try {
+//     const result = await Booking.deleteMany({ email });
+//     console.log(`${result.deletedCount} bookings deleted.`);
+//   } catch (error) {
+//     console.error("Error deleting bookings:", error);
+//   }
+// };
+
+// deleteBookingsForUser("johnsonrockstar@gmail.com");
 
 router.post("/send-otp", async (req, res) => {
   const { phoneNumber } = req.body;
