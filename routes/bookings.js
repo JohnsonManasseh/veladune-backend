@@ -86,7 +86,7 @@ router.post("/addbooking", async (req, res) => {
     if (!checkOutDate) missingFields.push("checkOutDate");
     if (!status) missingFields.push("status");
     // if (!userId) missingFields.push("userId");
-    if (!roomName) missingFields.push("roomId");
+    if (!roomName) missingFields.push("roomName");
     if (!firstName) missingFields.push("firstName");
     if (!lastName) missingFields.push("lastName");
     if (!gender) missingFields.push("gender");
@@ -107,7 +107,7 @@ router.post("/addbooking", async (req, res) => {
     // if (!user) {
     //   return res.status(400).json({ message: "User not found" });
     // }
-    const room = await Room.findById(roomId);
+    const room = await Room.findOne({ roomName: roomName });
     if (!room) {
       return res.status(400).json({ message: "Room not found" });
     }
@@ -227,7 +227,7 @@ router.post("/addbooking", async (req, res) => {
       </tr>
       <tr>
         <td style="padding: 8px; font-weight: bold;">Room ID:</td>
-        <td style="padding: 8px;">${roomId}</td>
+        <td style="padding: 8px;">${roomName}</td>
       </tr>
       <tr>
         <td style="padding: 8px; font-weight: bold;">Guests:</td>
