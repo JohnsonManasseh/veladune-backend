@@ -418,7 +418,7 @@ router.post("/userdetails", async (req, res) => {
     if (!user) {
       return res.status(400).json({ message: "User not found" });
     }
-    const bookings = await Booking.findOne(id);
+    const bookings = await Booking.findById(id);
     console.log("bookings", bookings);
     res.status(200).json({
       user,
