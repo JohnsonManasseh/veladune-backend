@@ -111,6 +111,10 @@ router.post("/addbooking", async (req, res) => {
     if (!room) {
       return res.status(400).json({ message: "Room not found" });
     }
+    const user = await User.findOne(email);
+    if (!user) {
+      return res.status(400).json({ message: "User not found" });
+    }
 
     const checkRoomAvailable = room?.bookings?.some((b) => {
       const existingCheckInDate = new Date(b.checkInDate);
@@ -158,6 +162,9 @@ router.post("/addbooking", async (req, res) => {
     await room.save();
 
     await newBooking.save();
+    user.bookings.push(newBooking);
+    await user.save();
+
     const pdfBuffer = await generateInvoicePdf({
       firstName,
       lastName,
