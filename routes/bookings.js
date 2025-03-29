@@ -47,7 +47,7 @@ const generateInvoicePdf = async (bookingDetails) => {
         <p><strong>Customer Name:</strong> ${bookingDetails.firstName} ${bookingDetails.lastName}</p>
         <p><strong>Check-in Date:</strong> ${bookingDetails.checkInDate}</p>
         <p><strong>Check-out Date:</strong> ${bookingDetails.checkOutDate}</p>
-        <p><strong>Room ID:</strong> ${bookingDetails.roomId}</p>
+        <p><strong>Room ID:</strong> ${bookingDetails.roomName}</p>
         <p><strong>Amount:</strong> $XXX</p>
         <hr>
         <p>Thank you for booking with us!</p>
@@ -68,7 +68,7 @@ router.post("/addbooking", async (req, res) => {
       checkOutDate,
       status,
       // userId,
-      roomId,
+      roomName,
       firstName,
       lastName,
       gender,
@@ -86,7 +86,7 @@ router.post("/addbooking", async (req, res) => {
     if (!checkOutDate) missingFields.push("checkOutDate");
     if (!status) missingFields.push("status");
     // if (!userId) missingFields.push("userId");
-    if (!roomId) missingFields.push("roomId");
+    if (!roomName) missingFields.push("roomId");
     if (!firstName) missingFields.push("firstName");
     if (!lastName) missingFields.push("lastName");
     if (!gender) missingFields.push("gender");
@@ -146,7 +146,7 @@ router.post("/addbooking", async (req, res) => {
       checkOutDate,
       // userId,
       status,
-      roomId,
+      roomName,
       firstName,
       lastName,
       gender,
@@ -173,7 +173,7 @@ router.post("/addbooking", async (req, res) => {
       checkInDate,
       checkOutDate,
       // userId,
-      roomId,
+      roomName,
     });
 
     const transporter = nodemailer.createTransport({
