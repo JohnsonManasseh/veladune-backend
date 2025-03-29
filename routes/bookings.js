@@ -410,18 +410,18 @@ router.put("/updatebooking", async (req, res) => {
 
 router.post("/userdetails", async (req, res) => {
   try {
-    const { id } = req.body;
+    const { email } = req.body;
 
-    if (!id) {
+    if (!email) {
       return res.status(400).json({ message: "User not found" });
     }
 
-    const user = await User.findById(id);
+    const user = await User.findOne({ email: email });
     if (!user) {
       return res.status(400).json({ message: "User not found" });
     }
     const bookings = await Booking.findOne({
-      userId: new mongoose.Types.ObjectId(id),
+      email: email,
     });
 
     console.log("bookings", bookings);
