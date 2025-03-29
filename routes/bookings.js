@@ -165,7 +165,7 @@ router.post("/addbooking", async (req, res) => {
     // }
     // await newBooking.save();
     // user.bookings.push(newBooking);
-    await user.save();
+    // await user.save();
 
     const pdfBuffer = await generateInvoicePdf({
       firstName,
