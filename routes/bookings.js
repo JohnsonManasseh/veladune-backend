@@ -422,7 +422,7 @@ router.post("/userdetails", async (req, res) => {
     console.log("bookings", bookings);
     res.status(200).json({
       user,
-      address: bookings.length > 0 ? bookings[0].address : null,
+      address: bookings?.length > 0 ? bookings[0]?.address : null,
 
       bookings,
       message: "User details found",
