@@ -47,7 +47,7 @@ const generateInvoicePdf = async (bookingDetails) => {
         <p><strong>Customer Name:</strong> ${bookingDetails.firstName} ${bookingDetails.lastName}</p>
         <p><strong>Check-in Date:</strong> ${bookingDetails.checkInDate}</p>
         <p><strong>Check-out Date:</strong> ${bookingDetails.checkOutDate}</p>
-        <p><strong>Room ID:</strong> ${bookingDetails.roomName}</p>
+        <p><strong>Room Name:</strong> ${bookingDetails.roomName}</p>
         <p><strong>Amount:</strong> $XXX</p>
         <hr>
         <p>Thank you for booking with us!</p>
@@ -108,7 +108,6 @@ router.post("/addbooking", async (req, res) => {
     //   return res.status(400).json({ message: "User not found" });
     // }
     const room = await Room.findOne({ name: roomName });
-    console.log("room", room);
     if (!room) {
       return res.status(400).json({ message: "Room not found" });
     }
@@ -227,7 +226,7 @@ router.post("/addbooking", async (req, res) => {
         <td style="padding: 8px;">${checkOutDate}</td>
       </tr>
       <tr>
-        <td style="padding: 8px; font-weight: bold;">Room ID:</td>
+        <td style="padding: 8px; font-weight: bold;">Room Name:</td>
         <td style="padding: 8px;">${roomName}</td>
       </tr>
       <tr>
@@ -638,7 +637,7 @@ router.post("/userdetails", async (req, res) => {
     if (!user) {
       return res.status(400).json({ message: "User not found" });
     }
-    const bookings = await Booking.find({ email: email });
+    const bookings = await Booking.findOne({ email: email });
     res.status(200).json({
       user,
       address: bookings.length > 0 ? bookings[0].address : null,
