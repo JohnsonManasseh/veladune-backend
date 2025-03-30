@@ -375,11 +375,12 @@ router.put("/updatebooking", async (req, res) => {
         .status(400)
         .json({ message: "Room is not available for the selected date" });
     }
-    room.bookings.push({ checkInDate, checkOutDate, roomName });
+    room.bookings.push({ checkInDate, checkOutDate });
     await room.save();
     const updateFields = {};
     if (checkInDate) updateFields.checkInDate = checkInDate;
     if (checkOutDate) updateFields.checkOutDate = checkOutDate;
+    if (roomName) updateFields.roomName = roomName;
 
     if (Object.keys(updateFields) === 0) {
       return res.status(400).json({ message: "No fields to update" });
