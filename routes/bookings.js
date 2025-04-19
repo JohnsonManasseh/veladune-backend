@@ -4,6 +4,7 @@ const Booking = require("../models/booking");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 const Room = require("../models/rooms");
+const interestlist = require("../models/interestList");
 const JWT_SECRET = process.env.JWT_SECRET;
 
 const router = express.Router();
@@ -434,6 +435,30 @@ router.post("/userdetails", async (req, res) => {
   } catch (err) {
     console.error("Error finding details", err);
     res.status(500).json({ message: "Failed to find user" });
+  }
+});
+
+router.post("/interestlist", async (req, res) => {
+  try {
+    const { name, email } = req.body;
+
+    if (!name) {
+      return res.status(400).json({ message: "Name is required" });
+    }
+    if (!email) {
+      return res.status(400).json({ message: "Email is required" });
+    }
+    const newEntry = new interestlist({ name, email });
+    await newEntry.save();
+    res
+      .status(200)
+      .json({ message: "Successfully added to the interest list" });
+  } catch (err) {
+    if (err.code === 11000) {
+      res.status(500).json({ message: "You're already on the interest list!" });
+    } else {
+      res.status(500).json({ message: "Failed to add to the interest list" });
+    }
   }
 });
 
