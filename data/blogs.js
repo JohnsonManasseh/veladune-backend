@@ -7,7 +7,7 @@ const blogs = [
     writtenBy: "BY JOHNSON MANASSEH",
     slug: "winter-getaway-kodaikanal-veladune-resort",
     thumbnail:
-      "https://asset.cloudinary.com/dxkgulut2/8c860cdddfcd39446bfb05528b148d4c",
+      "https://res.cloudinary.com/dxkgulut2/image/upload/v1746354727/winter-getaway-kodaikanal-veladune-resort_o4mhv9.jpg",
   },
 ];
 
