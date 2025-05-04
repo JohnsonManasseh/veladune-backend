@@ -6,7 +6,7 @@ const User = require("../models/user");
 const Room = require("../models/rooms");
 const interestlist = require("../models/interestList");
 const JWT_SECRET = process.env.JWT_SECRET;
-
+const blogs = require("../data/blogs");
 const router = express.Router();
 const bcrypt = require("bcryptjs");
 const twilio = require("twilio");
@@ -845,6 +845,10 @@ router.post("/createorder", async (req, res) => {
     console.error("Error creating order:", error);
     res.status(500).json({ error: error.message });
   }
+});
+
+router.get("/blogs", async (req, res) => {
+  res.json(blogs);
 });
 
 module.exports = router;
