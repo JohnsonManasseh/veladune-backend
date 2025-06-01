@@ -10,7 +10,7 @@ const blogs = [
       "https://res.cloudinary.com/dxkgulut2/image/upload/v1746354727/winter-getaway-kodaikanal-veladune-resort_o4mhv9.jpg",
   },
   {
-    id: 1,
+    id: 2,
     title: "5 Smart Tips for Safe and Fun Solo TravelTIPS",
     publishDate: "1st June 2025",
     readTime: "2 min read",
