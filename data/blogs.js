@@ -11,7 +11,7 @@ const blogs = [
   },
   {
     id: 2,
-    title: "5 Smart Tips for Safe and Fun Solo TravelTIPS",
+    title: "5 Smart Tips for Safe and Fun Solo Travel",
     publishDate: "1st June 2025",
     readTime: "2 min read",
     writtenBy: "By Johnson Manasseh",
