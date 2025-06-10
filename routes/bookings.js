@@ -829,6 +829,40 @@ const razorpay = new Razorpay({
   key_secret: "5qTR0TR9prVoyHHkmyFGhkVf",
 });
 
+router.post("/applycoupon", async (req, res) => {
+  const { code } = req.body;
+
+  try {
+    const coupon = await Coupon.findOne({ code, isActive: true });
+    if (!coupon) {
+      return res.status(400).json({ error: "Invalid coupon code." });
+    }
+
+    // Check if expired
+    if (coupon.expiryDate && new Date() > coupon.expiryDate) {
+      return res.status(400).json({ error: "Coupon expired." });
+    }
+
+    // Check usage limit
+    if (coupon.usageLimit && coupon.usedCount >= coupon.usageLimit) {
+      return res.status(400).json({ error: "Coupon usage limit reached." });
+    }
+
+    // Atomically increment usage count
+    await Coupon.updateOne({ _id: coupon._id }, { $inc: { usedCount: 1 } });
+
+    // Return the discount info
+    res.json({
+      success: true,
+      discountType: coupon.discountType,
+      discountValue: coupon.discountValue,
+    });
+  } catch (err) {
+    console.error("Error applying coupon:", err);
+    res.status(500).json({ error: "Server error." });
+  }
+});
+
 router.post("/createorder", async (req, res) => {
   const { amount } = req.body;
 
