@@ -1,6 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const Booking = require("../models/booking");
+const Coupon = require("../models/coupon");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 const Room = require("../models/rooms");
@@ -862,6 +863,27 @@ router.post("/applycoupon", async (req, res) => {
     res.status(500).json({ error: "Server error." });
   }
 });
+
+async function createCoupon() {
+  try {
+    const coupon = new Coupon({
+      code: "VELA50",
+      discountType: "percentage",
+      discountValue: 50,
+      usageLimit: 100,
+      usedCount: 0,
+      isActive: true,
+      expiryDate: new Date("2025-07-31T23:59:59.000Z"),
+    });
+
+    await coupon.save();
+    console.log("Coupon created:", coupon);
+  } catch (error) {
+    console.error("Error creating coupon:", error.message);
+  }
+}
+
+createCoupon();
 
 router.post("/createorder", async (req, res) => {
   const { amount } = req.body;
