@@ -867,7 +867,7 @@ router.post("/applycoupon", async (req, res) => {
 async function createCoupon() {
   try {
     const coupon = new Coupon({
-      code: "VELA50",
+      code: "EARLYVELADUNER",
       discountType: "percentage",
       discountValue: 50,
       usageLimit: 100,
