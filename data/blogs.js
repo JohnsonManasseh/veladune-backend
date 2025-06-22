@@ -19,6 +19,16 @@ const blogs = [
     thumbnail:
       "https://res.cloudinary.com/dxkgulut2/image/upload/v1748776710/solo-travel-thumbnail_h8imnr.jpg",
   },
+  {
+    id: 3,
+    title: "How to Plan a Surprise Getaway for Your Partner",
+    publishDate: "22 June, 2025",
+    readTime: "2 min read",
+    writtenBy: "By Johnson Manasseh",
+    slug: "how-to-plan-a-surprise-getaway",
+    thumbnail:
+      "https://res.cloudinary.com/dxkgulut2/image/upload/v1750602524/surprise_getaway_thumbnail__owwnvp.jpg",
+  },
 ];
 
 module.exports = blogs;
