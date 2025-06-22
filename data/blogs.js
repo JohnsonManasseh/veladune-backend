@@ -2,7 +2,7 @@ const blogs = [
   {
     id: 1,
     title: "Why Kodaikanal Should Be Your Winter Getaway This Year",
-    publishDate: "27th April 2025",
+    publishDate: "27 April, 2025",
     readTime: "2 min read",
     writtenBy: "By Johnson Manasseh",
     slug: "winter-getaway-kodaikanal-veladune-resort",
@@ -12,7 +12,7 @@ const blogs = [
   {
     id: 2,
     title: "5 Smart Tips for Safe and Fun Solo Travel",
-    publishDate: "1st June 2025",
+    publishDate: "1 June, 2025",
     readTime: "2 min read",
     writtenBy: "By Johnson Manasseh",
     slug: "5-smart-solo-travel-tips",
