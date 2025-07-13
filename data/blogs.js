@@ -29,6 +29,17 @@ const blogs = [
     thumbnail:
       "https://res.cloudinary.com/dxkgulut2/image/upload/v1750602524/surprise_getaway_thumbnail__owwnvp.jpg",
   },
+  {
+    id: 4,
+    title:
+      "Hill Station Travel Essentials: What to Pack for a Stylish, Cozy Getaway",
+    publishDate: "13 July, 2025",
+    readTime: "2 min read",
+    writtenBy: "By Johnson Manasseh",
+    slug: "hill-station-travel-essentials",
+    thumbnail:
+      "https://res.cloudinary.com/dxkgulut2/image/upload/v1752406562/hill-station-travel-essentials-thumbnail_rkbl7d.jpg",
+  },
 ];
 
 module.exports = blogs;
