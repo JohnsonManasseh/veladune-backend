@@ -754,6 +754,44 @@ router.delete("/deleteuser", async (req, res) => {
   }
 });
 
+router.post("/contact", async (req, res) => {
+  const { name, email, message } = req.body;
+  console.log("check nodemailer", name, email, message);
+
+  const transporter = nodemailer.createTransport({
+    host: "smtpout.secureserver.net",
+    port: 465,
+    secure: true,
+    auth: {
+      user: "info@veladune.com",
+      pass: "21596rocker",
+    },
+    tls: {
+      rejectUnauthorized: false,
+    },
+  });
+
+  const mailOptions = {
+    from: "info@veladune.com",
+    to: "info@veladune.com",
+    subject: `New message from ${name}`,
+    html: `
+      <h2>Contact Message</h2>
+      <p><strong>Name:</strong> ${name}</p>
+      <p><strong>Email:</strong> ${email}</p>
+      <p><strong>Message:</strong><br/>${message}</p>
+    `,
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    res.status(200).json({ success: true, message: "Email sent successfully" });
+  } catch (error) {
+    console.error("Email error:", error);
+    res.status(500).json({ success: false, message: "Failed to send email" });
+  }
+});
+
 // const clearBookings = async (roomId) => {
 //   try {
 //     await Room.findByIdAndUpdate(roomId, { $set: { bookings: [] } });
