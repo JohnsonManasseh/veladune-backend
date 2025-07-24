@@ -766,9 +766,6 @@ router.post("/contact", async (req, res) => {
       user: "info@veladune.com",
       pass: "21596rocker",
     },
-    tls: {
-      rejectUnauthorized: false,
-    },
   });
 
   const mailOptions = {
