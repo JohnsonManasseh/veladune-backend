@@ -42,7 +42,7 @@ const blogs = [
   },
   {
     id: 5,
-    title: "Five Luxury Journeys to Kodaikanal from Bangalore",
+    title: "The 5 Luxury Journeys to Kodaikanal from Bangalore",
     publishDate: "1 August, 2025",
     readTime: "2 min read",
     writtenBy: "By Johnson Manasseh",
