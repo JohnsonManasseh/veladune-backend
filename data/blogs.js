@@ -50,6 +50,16 @@ const blogs = [
     thumbnail:
       "https://res.cloudinary.com/dxkgulut2/image/upload/v1753913370/luxury-helicopter-travel-kodaikanal_jftlmd.jpg",
   },
+  {
+    id: 6,
+    title: "10 Hill Stations in India for an Unforgettable Mountain Escape",
+    publishDate: "24 August, 2025",
+    readTime: "2 min read",
+    writtenBy: "By Johnson Manasseh",
+    slug: "hill-stations-in-india-mountain-escape",
+    thumbnail:
+      "https://res.cloudinary.com/dxkgulut2/image/upload/v1756033970/mountain-climbing-couple_hzr8zi.jpg",
+  },
 ];
 
 module.exports = blogs;
