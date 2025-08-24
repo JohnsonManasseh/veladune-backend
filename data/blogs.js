@@ -57,7 +57,7 @@ const blogs = [
   },
   {
     id: 6,
-    title: "10 Hill Stations in India for an Unforgettable Mountain Escape",
+    title: "10 Hill Stations in India for a Serene Mountain Escape",
     publishDate: "24 August, 2025",
     readTime: "2 min read",
     writtenBy: "By Johnson Manasseh",
