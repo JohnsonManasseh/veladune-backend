@@ -6,6 +6,7 @@ const blogs = [
     readTime: "2 min read",
     writtenBy: "By Johnson Manasseh",
     slug: "winter-getaway-kodaikanal-veladune-resort",
+    imagePosition: "center",
     thumbnail:
       "https://res.cloudinary.com/dxkgulut2/image/upload/v1746354727/winter-getaway-kodaikanal-veladune-resort_o4mhv9.jpg",
   },
@@ -16,6 +17,7 @@ const blogs = [
     readTime: "2 min read",
     writtenBy: "By Johnson Manasseh",
     slug: "5-smart-solo-travel-tips",
+    imagePosition: "center",
     thumbnail:
       "https://res.cloudinary.com/dxkgulut2/image/upload/v1748776710/solo-travel-thumbnail_h8imnr.jpg",
   },
@@ -26,6 +28,7 @@ const blogs = [
     readTime: "2 min read",
     writtenBy: "By Johnson Manasseh",
     slug: "how-to-plan-a-surprise-getaway",
+    imagePosition: "left",
     thumbnail:
       "https://res.cloudinary.com/dxkgulut2/image/upload/v1750602524/surprise_getaway_thumbnail__owwnvp.jpg",
   },
@@ -37,6 +40,7 @@ const blogs = [
     readTime: "2 min read",
     writtenBy: "By Johnson Manasseh",
     slug: "hill-station-travel-essentials",
+    imagePosition: "center",
     thumbnail:
       "https://res.cloudinary.com/dxkgulut2/image/upload/v1752406562/hill-station-travel-essentials-thumbnail_rkbl7d.jpg",
   },
@@ -47,6 +51,7 @@ const blogs = [
     readTime: "2 min read",
     writtenBy: "By Johnson Manasseh",
     slug: "bangalore-to-kodaikanal-luxury-fly-drive",
+    imagePosition: "center",
     thumbnail:
       "https://res.cloudinary.com/dxkgulut2/image/upload/v1753913370/luxury-helicopter-travel-kodaikanal_jftlmd.jpg",
   },
@@ -57,6 +62,7 @@ const blogs = [
     readTime: "2 min read",
     writtenBy: "By Johnson Manasseh",
     slug: "hill-stations-in-india-mountain-escape",
+    imagePosition: "left",
     thumbnail:
       "https://res.cloudinary.com/dxkgulut2/image/upload/v1756033970/mountain-climbing-couple_hzr8zi.jpg",
   },
