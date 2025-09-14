@@ -66,6 +66,17 @@ const blogs = [
     thumbnail:
       "https://res.cloudinary.com/dxkgulut2/image/upload/v1756033970/mountain-climbing-couple_hzr8zi.jpg",
   },
+  {
+    id: 7,
+    title: "5 Things You Can Only Do in Kodaikanal",
+    publishDate: "14 September, 2025",
+    readTime: "2 min read",
+    writtenBy: "By Johnson Manasseh",
+    slug: "things-to-do-in-kodaikanal",
+    imagePosition: "left",
+    thumbnail:
+      "https://res.cloudinary.com/dxkgulut2/image/upload/v1757851409/guna-cave-kodaikanal_m2katp.jpg",
+  },
 ];
 
 module.exports = blogs;
