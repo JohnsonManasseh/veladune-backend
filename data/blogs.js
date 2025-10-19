@@ -78,7 +78,7 @@ const blogs = [
       "https://res.cloudinary.com/dxkgulut2/image/upload/v1757851409/guna-cave-kodaikanal_m2katp.jpg",
   },
   {
-    id: 7,
+    id: 8,
     title: " Ooty vs Kodaikanal : Which is the Right Retreat for You?",
     publishDate: "19 October, 2025",
     readTime: "2 min read",
