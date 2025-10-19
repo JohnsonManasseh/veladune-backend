@@ -84,7 +84,7 @@ const blogs = [
     readTime: "2 min read",
     writtenBy: "By Johnson Manasseh",
     slug: "kodaikanal-vs-ooty-right-retreat",
-    imagePosition: "left",
+    imagePosition: "center",
     thumbnail:
       "https://res.cloudinary.com/dxkgulut2/image/upload/v1760877605/ooty-vs-kodaikanal_qjottl.jpg",
   },
