@@ -79,7 +79,7 @@ const blogs = [
   },
   {
     id: 8,
-    title: " Ooty vs Kodaikanal : Which is the Right Retreat for You?",
+    title: " Ooty vs Kodaikanal: Which is the Right Retreat for You?",
     publishDate: "19 October, 2025",
     readTime: "2 min read",
     writtenBy: "By Johnson Manasseh",
