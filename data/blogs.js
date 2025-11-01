@@ -40,7 +40,7 @@ const blogs = [
     readTime: "2 min read",
     writtenBy: "By Johnson Manasseh",
     slug: "hill-station-travel-essentials",
-    imagePosition: "center",
+    imagePosition: "bottom",
     thumbnail:
       "https://res.cloudinary.com/dxkgulut2/image/upload/v1752406562/hill-station-travel-essentials-thumbnail_rkbl7d.jpg",
   },
