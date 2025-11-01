@@ -51,7 +51,7 @@ const blogs = [
     readTime: "2 min read",
     writtenBy: "By Johnson Manasseh",
     slug: "bangalore-to-kodaikanal-luxury-fly-drive",
-    imagePosition: "center",
+    imagePosition: "top",
     thumbnail:
       "https://res.cloudinary.com/dxkgulut2/image/upload/v1753913370/luxury-helicopter-travel-kodaikanal_jftlmd.jpg",
   },
