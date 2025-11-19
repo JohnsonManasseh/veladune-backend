@@ -79,7 +79,7 @@ const blogs = [
   },
   {
     id: 8,
-    title: " Ooty vs Kodaikanal: Which is the Right Retreat for You?",
+    title: "Ooty vs Kodaikanal: Which is the Right Retreat for You?",
     publishDate: "19 October, 2025",
     readTime: "2 min read",
     writtenBy: "By Johnson Manasseh",
@@ -87,6 +87,17 @@ const blogs = [
     imagePosition: "center",
     thumbnail:
       "https://res.cloudinary.com/dxkgulut2/image/upload/v1760877605/ooty-vs-kodaikanal_qjottl.jpg",
+  },
+  {
+    id: 9,
+    title: "5 Luxury Ways to Reach Kodaikanal from Hyderabad",
+    publishDate: "16 November, 2025",
+    readTime: "2 min read",
+    writtenBy: "By Johnson Manasseh",
+    slug: "best-ways-travel-hyderabad-kodaikanal",
+    imagePosition: "center",
+    thumbnail:
+      "https://res.cloudinary.com/dxkgulut2/image/upload/v1763528223/hyderabad-to-kodaikanal_dpgcwd.jpg",
   },
 ];
 
