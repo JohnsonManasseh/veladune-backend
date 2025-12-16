@@ -99,6 +99,17 @@ const blogs = [
     thumbnail:
       "https://res.cloudinary.com/dxkgulut2/image/upload/v1763528223/hyderabad-to-kodaikanal_dpgcwd.jpg",
   },
+  {
+    id: 10,
+    title: "First time in Kodaikanal? Start here",
+    publishDate: "14 December, 2025",
+    readTime: "2 min read",
+    writtenBy: "By Johnson Manasseh",
+    slug: "first-time-in-kodaikanal-guide",
+    imagePosition: "center",
+    thumbnail:
+      "https://res.cloudinary.com/dxkgulut2/image/upload/v1765862480/first-time-in-kodaikanal_vgzclb.jpg",
+  },
 ];
 
 module.exports = blogs;
