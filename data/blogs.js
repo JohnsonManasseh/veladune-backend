@@ -63,8 +63,7 @@ const blogs = [
     writtenBy: "By Johnson Manasseh",
     slug: "hill-stations-in-india-mountain-escape",
     imagePosition: "left",
-    thumbnail:
-      "https://res.cloudinary.com/dxkgulut2/image/upload/v1756033970/mountain-climbing-couple_hzr8zi.jpg",
+    thumbnail: "123",
   },
   {
     id: 7,
