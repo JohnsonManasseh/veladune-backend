@@ -81,6 +81,7 @@ router.post("/addbooking", async (req, res) => {
       childrens,
       infants,
       address,
+      totalAmount,
     } = req.body;
 
     const missingFields = [];
