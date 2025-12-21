@@ -298,10 +298,8 @@ router.put("/updatebooking", async (req, res) => {
   try {
     const { bookingId, checkInDate, checkOutDate, action, roomName } = req.body;
 
-    if (!bookingId || !roomName) {
-      return res.status(400).json({
-        message: "bookingId and roomName are required",
-      });
+    if (!bookingId) {
+      return res.status(400).json({ message: "bookingId is required" });
     }
 
     const booking = await Booking.findById(bookingId);
@@ -309,8 +307,23 @@ router.put("/updatebooking", async (req, res) => {
       return res.status(404).json({ message: "Booking not found" });
     }
 
-    /* ---------------- CANCEL ---------------- */
+    /* =====================================================
+       CANCEL BOOKING
+    ===================================================== */
     if (action === "cancel") {
+      const room = await Room.findOne({ name: booking.roomName });
+
+      if (room) {
+        room.bookings = room.bookings.filter(
+          (b) =>
+            new Date(b.checkInDate).getTime() !==
+              new Date(booking.checkInDate).getTime() ||
+            new Date(b.checkOutDate).getTime() !==
+              new Date(booking.checkOutDate).getTime()
+        );
+        await room.save();
+      }
+
       booking.status = "cancelled";
       await booking.save();
 
@@ -319,23 +332,37 @@ router.put("/updatebooking", async (req, res) => {
       });
     }
 
-    /* ---------------- UPDATE ---------------- */
-    if (!checkInDate || !checkOutDate) {
+    /* =====================================================
+       UPDATE / MOVE BOOKING
+    ===================================================== */
+    if (!checkInDate || !checkOutDate || !roomName) {
       return res.status(400).json({
-        message: "Both checkInDate and checkOutDate are required",
+        message: "checkInDate, checkOutDate and roomName are required",
       });
     }
 
     const newCheckIn = new Date(checkInDate);
     const newCheckOut = new Date(checkOutDate);
 
-    /* -------- availability check -------- */
-    const conflict = await Booking.findOne({
-      _id: { $ne: bookingId },
-      roomName,
-      status: { $ne: "cancelled" },
-      checkInDate: { $lt: newCheckOut },
-      checkOutDate: { $gt: newCheckIn },
+    if (newCheckIn >= newCheckOut) {
+      return res.status(400).json({
+        message: "checkOutDate must be after checkInDate",
+      });
+    }
+
+    const oldRoomName = booking.roomName;
+
+    /* ---------- CHECK AVAILABILITY IN TARGET ROOM ---------- */
+    const targetRoom = await Room.findOne({ name: roomName });
+    if (!targetRoom) {
+      return res.status(404).json({ message: "Target room not found" });
+    }
+
+    const conflict = targetRoom.bookings.some((b) => {
+      return (
+        newCheckIn < new Date(b.checkOutDate) &&
+        newCheckOut > new Date(b.checkInDate)
+      );
     });
 
     if (conflict) {
@@ -344,20 +371,44 @@ router.put("/updatebooking", async (req, res) => {
       });
     }
 
-    /* -------- UPDATE = REPLACE -------- */
+    /* ---------- REMOVE FROM OLD ROOM ---------- */
+    const oldRoom = await Room.findOne({ name: oldRoomName });
+
+    if (oldRoom) {
+      oldRoom.bookings = oldRoom.bookings.filter(
+        (b) =>
+          new Date(b.checkInDate).getTime() !==
+            new Date(booking.checkInDate).getTime() ||
+          new Date(b.checkOutDate).getTime() !==
+            new Date(booking.checkOutDate).getTime()
+      );
+      await oldRoom.save();
+    }
+
+    /* ---------- ADD TO NEW ROOM ---------- */
+    targetRoom.bookings.push({
+      checkInDate: newCheckIn,
+      checkOutDate: newCheckOut,
+    });
+    await targetRoom.save();
+
+    /* ---------- UPDATE BOOKING DOCUMENT ---------- */
     booking.checkInDate = newCheckIn;
     booking.checkOutDate = newCheckOut;
     booking.roomName = roomName;
 
     await booking.save();
 
-    res.status(200).json({
+    return res.status(200).json({
       message: "Booking updated successfully",
       booking,
     });
   } catch (error) {
     console.error("Update booking error:", error);
-    res.status(500).json({ message: error.message });
+    return res.status(500).json({
+      message: "Failed to update booking",
+      error: error.message,
+    });
   }
 });
 
