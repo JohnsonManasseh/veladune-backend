@@ -323,17 +323,16 @@ router.put("/updatebooking", async (req, res) => {
       );
 
       let refundAmount = 0;
+      let refundAttempted = false;
 
       if (daysBeforeCheckIn >= 7) {
-        refundAmount = booking.totalAmount; // 100% refund
+        refundAmount = booking.totalAmount;
       } else if (daysBeforeCheckIn >= 3) {
-        refundAmount = booking.totalAmount * 0.5; // 50% refund
-      } else {
-        refundAmount = 0; // No refund
+        refundAmount = booking.totalAmount * 0.5;
       }
 
+      /* ---------- REMOVE ROOM BOOKING ---------- */
       const room = await Room.findOne({ name: booking.roomName });
-
       if (room) {
         room.bookings = room.bookings.filter(
           (b) =>
@@ -345,12 +344,13 @@ router.put("/updatebooking", async (req, res) => {
         await room.save();
       }
 
+      /* ---------- PROCESS REFUND ---------- */
       if (refundAmount > 0 && booking.razorpayPaymentId) {
         try {
           const refund = await razorpay.payments.refund(
             booking.razorpayPaymentId,
             {
-              amount: Math.round(refundAmount * 100), // ₹ → paise
+              amount: Math.round(refundAmount * 100),
               speed: "normal",
             }
           );
@@ -358,7 +358,8 @@ router.put("/updatebooking", async (req, res) => {
           console.log("✅ RAZORPAY REFUND CREATED:", refund);
 
           booking.refundStatus = "initiated";
-          booking.refundRazorpayId = refund.id; // optional but recommended
+          booking.refundRazorpayId = refund.id;
+          refundAttempted = true;
         } catch (error) {
           console.error("❌ RAZORPAY REFUND FAILED:", error);
 
@@ -373,15 +374,20 @@ router.put("/updatebooking", async (req, res) => {
 
       booking.status = "cancelled";
       booking.refundAmount = refundAmount;
-      booking.refundStatus = refundAmount > 0 ? "initiated" : "not_applicable";
       booking.cancelledAt = new Date();
+
+      if (!refundAttempted) {
+        booking.refundStatus = refundAmount > 0 ? "failed" : "not_applicable";
+      }
 
       await booking.save();
 
       return res.status(200).json({
         message:
-          refundAmount > 0
+          refundAmount > 0 && refundAttempted
             ? `Booking cancelled. ₹${refundAmount} refund initiated.`
+            : refundAmount > 0
+            ? "Booking cancelled. Refund could not be initiated."
             : "Booking cancelled. No refund as per policy.",
         refundAmount,
       });
