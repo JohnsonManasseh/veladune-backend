@@ -299,46 +299,24 @@ router.put("/updatebooking", async (req, res) => {
     const { bookingId, checkInDate, checkOutDate, action, roomName } = req.body;
 
     if (!bookingId || !roomName) {
-      return res
-        .status(400)
-        .json({ message: "bookingId and roomName required" });
+      return res.status(400).json({
+        message: "bookingId and roomName are required",
+      });
     }
 
-    const room = await Room.findOne({ name: roomName });
     const booking = await Booking.findById(bookingId);
-
-    if (!room || !booking) {
-      return res.status(404).json({ message: "Room or booking not found" });
+    if (!booking) {
+      return res.status(404).json({ message: "Booking not found" });
     }
 
     /* ---------------- CANCEL ---------------- */
     if (action === "cancel") {
-      room.bookings = room.bookings.filter((b) => {
-        // backward-safe removal
-        if (b.bookingId) {
-          return b.bookingId.toString() !== bookingId;
-        }
+      booking.status = "cancelled";
+      await booking.save();
 
-        // fallback for old records (date match)
-        return !(
-          new Date(b.checkInDate).getTime() ===
-            new Date(booking.checkInDate).getTime() &&
-          new Date(b.checkOutDate).getTime() ===
-            new Date(booking.checkOutDate).getTime()
-        );
+      return res.status(200).json({
+        message: "Booking cancelled successfully",
       });
-
-      await room.save();
-
-      await Booking.findByIdAndUpdate(
-        bookingId,
-        { status: "cancelled" },
-        { new: true }
-      );
-
-      return res
-        .status(200)
-        .json({ message: "Booking cancelled successfully" });
     }
 
     /* ---------------- UPDATE ---------------- */
@@ -351,58 +329,31 @@ router.put("/updatebooking", async (req, res) => {
     const newCheckIn = new Date(checkInDate);
     const newCheckOut = new Date(checkOutDate);
 
-    /* availability check */
-    const conflict = room.bookings.some((b) => {
-      if (b.bookingId && b.bookingId.toString() === bookingId) return false;
-
-      return (
-        newCheckIn < new Date(b.checkOutDate) &&
-        newCheckOut > new Date(b.checkInDate)
-      );
+    /* -------- availability check -------- */
+    const conflict = await Booking.findOne({
+      _id: { $ne: bookingId },
+      roomName,
+      status: { $ne: "cancelled" },
+      checkInDate: { $lt: newCheckOut },
+      checkOutDate: { $gt: newCheckIn },
     });
 
     if (conflict) {
-      return res
-        .status(400)
-        .json({ message: "Room not available for selected dates" });
+      return res.status(400).json({
+        message: "Room not available for selected dates",
+      });
     }
 
-    /* remove old entry (safe) */
-    room.bookings = room.bookings.filter((b) => {
-      if (b.bookingId) {
-        return b.bookingId.toString() !== bookingId;
-      }
+    /* -------- UPDATE = REPLACE -------- */
+    booking.checkInDate = newCheckIn;
+    booking.checkOutDate = newCheckOut;
+    booking.roomName = roomName;
 
-      return !(
-        new Date(b.checkInDate).getTime() ===
-          new Date(booking.checkInDate).getTime() &&
-        new Date(b.checkOutDate).getTime() ===
-          new Date(booking.checkOutDate).getTime()
-      );
-    });
-
-    /* insert updated entry */
-    room.bookings.push({
-      bookingId,
-      checkInDate: newCheckIn,
-      checkOutDate: newCheckOut,
-    });
-
-    await room.save();
-
-    const updatedBooking = await Booking.findByIdAndUpdate(
-      bookingId,
-      {
-        checkInDate: newCheckIn,
-        checkOutDate: newCheckOut,
-        roomName,
-      },
-      { new: true }
-    );
+    await booking.save();
 
     res.status(200).json({
       message: "Booking updated successfully",
-      booking: updatedBooking,
+      booking,
     });
   } catch (error) {
     console.error("Update booking error:", error);
