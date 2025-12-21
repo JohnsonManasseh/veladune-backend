@@ -19,6 +19,7 @@ const nodemailer = require("nodemailer");
 const { chromium } = require("playwright");
 const Razorpay = require("razorpay");
 const mongoose = require("mongoose");
+const crypto = require("crypto");
 
 // (async () => {
 //   const browser = await puppeteer.launch({
@@ -1012,6 +1013,60 @@ router.post("/createorder", async (req, res) => {
   } catch (error) {
     console.error("Error creating order:", error);
     res.status(500).json({ error: error.message });
+  }
+});
+
+router.post("/verifypayment", async (req, res) => {
+  try {
+    const { bookingId, razorpayPaymentId, razorpayOrderId, razorpaySignature } =
+      req.body;
+
+    if (
+      !bookingId ||
+      !razorpayPaymentId ||
+      !razorpayOrderId ||
+      !razorpaySignature
+    ) {
+      return res.status(400).json({
+        message: "Missing payment verification fields",
+      });
+    }
+
+    const booking = await Booking.findById(bookingId);
+    if (!booking) {
+      return res.status(404).json({ message: "Booking not found" });
+    }
+
+    /* ---------- VERIFY SIGNATURE ---------- */
+    const body = `${razorpayOrderId}|${razorpayPaymentId}`;
+
+    const expectedSignature = crypto
+      .createHmac("sha256", process.env.RAZORPAY_SECRET)
+      .update(body)
+      .digest("hex");
+
+    if (expectedSignature !== razorpaySignature) {
+      return res.status(400).json({
+        message: "Payment verification failed",
+      });
+    }
+
+    /* ---------- SAVE PAYMENT ---------- */
+    booking.razorpayPaymentId = razorpayPaymentId;
+    booking.razorpayOrderId = razorpayOrderId;
+    booking.paymentStatus = "paid";
+    booking.status = "confirmed";
+
+    await booking.save();
+
+    return res.json({
+      message: "Payment verified and booking confirmed",
+    });
+  } catch (error) {
+    console.error("Verify payment error:", error);
+    return res.status(500).json({
+      message: "Payment verification failed",
+    });
   }
 });
 
