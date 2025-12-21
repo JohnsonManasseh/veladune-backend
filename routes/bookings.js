@@ -954,16 +954,31 @@ async function createCoupon() {
 createCoupon();
 
 router.post("/createorder", async (req, res) => {
-  const { amount } = req.body;
-
-  const options = {
-    amount: amount * 100,
-    currency: "INR",
-    receipt: `receipt_${Date.now()}`,
-  };
-
   try {
-    const order = await razorpay.orders.create(options);
+    const { amount, bookingId } = req.body;
+
+    if (!amount || !bookingId) {
+      return res
+        .status(400)
+        .json({ message: "amount and bookingId are required" });
+    }
+
+    const booking = await Booking.findById(bookingId);
+    if (!booking) {
+      return res.status(404).json({ message: "Booking not found" });
+    }
+
+    const order = await razorpay.orders.create({
+      amount: Math.round(amount * 100),
+      currency: "INR",
+      receipt: `booking_${bookingId}`,
+    });
+
+    booking.razorpayOrderId = order.id;
+    booking.totalAmount = amount;
+    booking.paymentStatus = "pending";
+    await booking.save();
+
     res.status(200).json(order);
   } catch (error) {
     console.error("Error creating order:", error);
