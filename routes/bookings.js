@@ -357,85 +357,59 @@ router.put("/updatebooking", async (req, res) => {
       });
     }
 
-    const checkRoomAvailable = room.bookings.some((b) => {
-      if (
-        b.checkInDate.toISOString() === booking.checkInDate.toISOString() &&
-        b.checkOutDate.toISOString() === booking.checkOutDate.toISOString()
-      ) {
-        return false;
-      }
-      const existingCheckInDate = new Date(b.checkInDate);
-      const existingCheckOutDate = new Date(b.checkOutDate);
-      const newCheckInDate = new Date(checkInDate);
-      const newCheckOutDate = new Date(checkOutDate);
+    if (!checkInDate || !checkOutDate) {
+      return res.status(400).json({
+        message: "Both checkInDate and checkOutDate are required",
+      });
+    }
 
-      // return (
-      //   (newCheckInDate >= existingCheckInDate &&
-      //     newCheckInDate < existingCheckOutDate) ||
-      //   (newCheckOutDate > existingCheckInDate &&
-      //     newCheckOutDate <= existingCheckOutDate) ||
-      //   (newCheckInDate <= existingCheckInDate &&
-      //     newCheckOutDate >= existingCheckOutDate)
-      // );
+    const newCheckIn = new Date(checkInDate);
+    const newCheckOut = new Date(checkOutDate);
+
+    /* ---- availability check (exclude current booking) ---- */
+    const conflict = room.bookings.some((b) => {
+      if (b.bookingId.toString() === bookingId) return false;
+
       return (
-        newCheckInDate < existingCheckOutDate &&
-        newCheckOutDate > existingCheckInDate
+        newCheckIn < new Date(b.checkOutDate) &&
+        newCheckOut > new Date(b.checkInDate)
       );
     });
 
-    room.bookings = room.bookings.filter(
-      (b) =>
-        b.checkInDate.toISOString() !== booking.checkInDate.toISOString() ||
-        b.checkOutDate.toISOString() !== booking.checkOutDate.toISOString()
-    );
-
-    if (checkRoomAvailable) {
+    if (conflict) {
       return res
         .status(400)
-        .json({ message: "Room is not available for the selected date" });
+        .json({ message: "Room not available for selected dates" });
     }
-    // room.bookings.push({ checkInDate, checkOutDate });
+
+    /* ---- remove old booking entry ---- */
+    room.bookings = room.bookings.filter(
+      (b) => b.bookingId.toString() !== bookingId
+    );
+
+    /* ---- insert updated dates ---- */
     room.bookings.push({
-      checkInDate,
-      checkOutDate,
+      bookingId,
+      checkInDate: newCheckIn,
+      checkOutDate: newCheckOut,
     });
-    await room.save();
 
     await room.save();
-    const updateFields = {};
-    if (checkInDate) updateFields.checkInDate = checkInDate;
-    if (checkOutDate) updateFields.checkOutDate = checkOutDate;
-    if (roomName) updateFields.roomName = roomName;
 
-    if (Object.keys(updateFields).length === 0) {
-      return res.status(400).json({ message: "No fields to update" });
-    }
+    /* ---- update booking document ---- */
     const updatedBooking = await Booking.findByIdAndUpdate(
       bookingId,
       {
-        checkInDate,
-        checkOutDate,
+        checkInDate: newCheckIn,
+        checkOutDate: newCheckOut,
         roomName,
       },
       { new: true, runValidators: true }
     );
 
-    // const updatedBooking = await Booking.findByIdAndUpdate(
-    //   bookingId,
-    //   updateFields,
-    //   {
-    //     new: true,
-    //     runValidators: true,
-    //   }
-    // );
-
-    if (!updatedBooking) {
-      return res.status(400).json({ message: "No bookings found" });
-    }
-
     res.status(200).json({
-      message: "Bookings updated successfully",
-      // booking: updatedBooking,
+      message: "Booking updated successfully",
+      booking: updatedBooking,
     });
   } catch (error) {
     console.error("Error updating booking", error);
