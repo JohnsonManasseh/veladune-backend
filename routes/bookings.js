@@ -290,8 +290,10 @@ router.post("/addbooking", async (req, res) => {
 
     res.status(201).json({ newBooking, message: "Your booking is reserved" });
   } catch (err) {
-    console.error("Error creating booking:", err);
-    res.status(500).json({ message: "Failed to create booking" });
+    console.error("Error creating booking:", err.message);
+    return res.status(500).json({
+      message: err.message,
+    });
   }
 });
 
