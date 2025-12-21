@@ -25,7 +25,7 @@
     "mongoose": "^8.9.5",
     "multer": "^1.4.5-lts.1",
     "nodemailer": "^6.10.0",
-    "nodemon": "^3.1.9",
+    "nodemon": "^3.1.11",
     "playwright": "^1.50.1",
     "razorpay": "^2.9.6",
     "twilio": "^5.4.5"

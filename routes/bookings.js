@@ -358,44 +358,76 @@ router.put("/updatebooking", async (req, res) => {
     }
 
     const checkRoomAvailable = room.bookings.some((b) => {
+      if (
+        b.checkInDate.toISOString() === booking.checkInDate.toISOString() &&
+        b.checkOutDate.toISOString() === booking.checkOutDate.toISOString()
+      ) {
+        return false;
+      }
       const existingCheckInDate = new Date(b.checkInDate);
       const existingCheckOutDate = new Date(b.checkOutDate);
       const newCheckInDate = new Date(checkInDate);
       const newCheckOutDate = new Date(checkOutDate);
 
+      // return (
+      //   (newCheckInDate >= existingCheckInDate &&
+      //     newCheckInDate < existingCheckOutDate) ||
+      //   (newCheckOutDate > existingCheckInDate &&
+      //     newCheckOutDate <= existingCheckOutDate) ||
+      //   (newCheckInDate <= existingCheckInDate &&
+      //     newCheckOutDate >= existingCheckOutDate)
+      // );
       return (
-        (newCheckInDate >= existingCheckInDate &&
-          newCheckInDate < existingCheckOutDate) ||
-        (newCheckOutDate > existingCheckInDate &&
-          newCheckOutDate <= existingCheckOutDate) ||
-        (newCheckInDate <= existingCheckInDate &&
-          newCheckOutDate >= existingCheckOutDate)
+        newCheckInDate < existingCheckOutDate &&
+        newCheckOutDate > existingCheckInDate
       );
     });
+
+    room.bookings = room.bookings.filter(
+      (b) =>
+        b.checkInDate.toISOString() !== booking.checkInDate.toISOString() ||
+        b.checkOutDate.toISOString() !== booking.checkOutDate.toISOString()
+    );
+
     if (checkRoomAvailable) {
       return res
         .status(400)
         .json({ message: "Room is not available for the selected date" });
     }
-    room.bookings.push({ checkInDate, checkOutDate });
+    // room.bookings.push({ checkInDate, checkOutDate });
+    room.bookings.push({
+      checkInDate,
+      checkOutDate,
+    });
+    await room.save();
+
     await room.save();
     const updateFields = {};
     if (checkInDate) updateFields.checkInDate = checkInDate;
     if (checkOutDate) updateFields.checkOutDate = checkOutDate;
     if (roomName) updateFields.roomName = roomName;
 
-    if (Object.keys(updateFields) === 0) {
+    if (Object.keys(updateFields).length === 0) {
       return res.status(400).json({ message: "No fields to update" });
     }
-
     const updatedBooking = await Booking.findByIdAndUpdate(
       bookingId,
-      updateFields,
       {
-        new: true,
-        runValidators: true,
-      }
+        checkInDate,
+        checkOutDate,
+        roomName,
+      },
+      { new: true, runValidators: true }
     );
+
+    // const updatedBooking = await Booking.findByIdAndUpdate(
+    //   bookingId,
+    //   updateFields,
+    //   {
+    //     new: true,
+    //     runValidators: true,
+    //   }
+    // );
 
     if (!updatedBooking) {
       return res.status(400).json({ message: "No bookings found" });
