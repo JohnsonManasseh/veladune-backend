@@ -1041,7 +1041,7 @@ router.post("/verifypayment", async (req, res) => {
     const body = `${razorpayOrderId}|${razorpayPaymentId}`;
 
     const expectedSignature = crypto
-      .createHmac("sha256", process.env.RAZORPAY_SECRET)
+      .createHmac("sha256", "5qTR0TR9prVoyHHkmyFGhkVf")
       .update(body)
       .digest("hex");
 
