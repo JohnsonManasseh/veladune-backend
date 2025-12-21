@@ -346,10 +346,29 @@ router.put("/updatebooking", async (req, res) => {
       }
 
       if (refundAmount > 0 && booking.razorpayPaymentId) {
-        await razorpay.payments.refund(booking.razorpayPaymentId, {
-          amount: Math.round(refundAmount * 100), // ₹ → paise
-          speed: "normal", // DO NOT use instant by default
-        });
+        try {
+          const refund = await razorpay.payments.refund(
+            booking.razorpayPaymentId,
+            {
+              amount: Math.round(refundAmount * 100), // ₹ → paise
+              speed: "normal",
+            }
+          );
+
+          console.log("✅ RAZORPAY REFUND CREATED:", refund);
+
+          booking.refundStatus = "initiated";
+          booking.refundRazorpayId = refund.id; // optional but recommended
+        } catch (error) {
+          console.error("❌ RAZORPAY REFUND FAILED:", error);
+
+          booking.refundStatus = "failed";
+          await booking.save();
+
+          return res.status(500).json({
+            message: "Refund failed at payment gateway",
+          });
+        }
       }
 
       booking.status = "cancelled";
