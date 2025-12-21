@@ -311,6 +311,23 @@ router.put("/updatebooking", async (req, res) => {
        CANCEL BOOKING
     ===================================================== */
     if (action === "cancel") {
+      const now = new Date();
+      const checkIn = new Date(booking.checkInDate);
+
+      const daysBeforeCheckIn = Math.ceil(
+        (checkIn - now) / (1000 * 60 * 60 * 24)
+      );
+
+      let refundAmount = 0;
+
+      if (daysBeforeCheckIn >= 7) {
+        refundAmount = booking.totalAmount; // 100% refund
+      } else if (daysBeforeCheckIn >= 3) {
+        refundAmount = booking.totalAmount * 0.5; // 50% refund
+      } else {
+        refundAmount = 0; // No refund
+      }
+
       const room = await Room.findOne({ name: booking.roomName });
 
       if (room) {
@@ -324,11 +341,26 @@ router.put("/updatebooking", async (req, res) => {
         await room.save();
       }
 
+      if (refundAmount > 0 && booking.razorpayPaymentId) {
+        await razorpay.payments.refund(booking.razorpayPaymentId, {
+          amount: Math.round(refundAmount * 100), // ₹ → paise
+          speed: "normal", // DO NOT use instant by default
+        });
+      }
+
       booking.status = "cancelled";
+      booking.refundAmount = refundAmount;
+      booking.refundStatus = refundAmount > 0 ? "initiated" : "not_applicable";
+      booking.cancelledAt = new Date();
+
       await booking.save();
 
       return res.status(200).json({
-        message: "Booking cancelled successfully",
+        message:
+          refundAmount > 0
+            ? `Booking cancelled. ₹${refundAmount} refund initiated.`
+            : "Booking cancelled. No refund as per policy.",
+        refundAmount,
       });
     }
 
