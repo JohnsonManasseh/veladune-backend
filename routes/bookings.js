@@ -160,6 +160,7 @@ router.post("/addbooking", async (req, res) => {
       childrens,
       infants,
       address,
+      totalAmount,
     });
     room.availability = false;
     room.bookings.push({ checkInDate, checkOutDate });
