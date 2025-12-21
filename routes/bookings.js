@@ -298,148 +298,115 @@ router.put("/updatebooking", async (req, res) => {
   try {
     const { bookingId, checkInDate, checkOutDate, action, roomName } = req.body;
 
-    if (!bookingId) {
-      return res.status(400).json({ message: "Booking id is required" });
-    }
-    if (!roomName) {
-      return res.status(400).json({ message: "room name is required" });
-    }
-    if (!checkInDate && !checkOutDate && !action) {
+    if (!bookingId || !roomName) {
       return res
         .status(400)
-        .json({ message: "either check in - out date or action is required" });
-    }
-    if (
-      (checkInDate && !checkOutDate && roomName) ||
-      (!checkInDate && checkOutDate && roomName)
-    ) {
-      return res.status(400).json({
-        message:
-          "Both 'checkInDate' and 'checkOutDate' must be provided to update booking dates.",
-      });
-    }
-
-    if (
-      (action && checkInDate && roomName) ||
-      (action && checkOutDate && roomName)
-    ) {
-      return res.status(400).json({
-        message:
-          "'action' cannot be provided with 'checkInDate' and 'checkOutDate'.",
-      });
+        .json({ message: "bookingId and roomName required" });
     }
 
     const room = await Room.findOne({ name: roomName });
     const booking = await Booking.findById(bookingId);
-    if (action === "cancel") {
-      room.availability = true;
 
-      room.bookings = room.bookings.filter(
-        (b) =>
-          b.checkInDate.toISOString() !== booking.checkInDate.toISOString() &&
-          b.checkOutDate.toISOString() !== booking.checkOutDate.toISOString()
-      );
+    if (!room || !booking) {
+      return res.status(404).json({ message: "Room or booking not found" });
+    }
+
+    /* ---------------- CANCEL ---------------- */
+    if (action === "cancel") {
+      room.bookings = room.bookings.filter((b) => {
+        // backward-safe removal
+        if (b.bookingId) {
+          return b.bookingId.toString() !== bookingId;
+        }
+
+        // fallback for old records (date match)
+        return !(
+          new Date(b.checkInDate).getTime() ===
+            new Date(booking.checkInDate).getTime() &&
+          new Date(b.checkOutDate).getTime() ===
+            new Date(booking.checkOutDate).getTime()
+        );
+      });
+
       await room.save();
 
-      const cancelledBooking = await Booking.findByIdAndUpdate(
+      await Booking.findByIdAndUpdate(
         bookingId,
         { status: "cancelled" },
         { new: true }
       );
-      if (!cancelledBooking) {
-        return res.status(400).json({ message: "Booking not found" });
-      }
 
-      return res.status(200).json({
-        cancelledBooking,
-        room,
-        message: "Booking cancelled successfully",
+      return res
+        .status(200)
+        .json({ message: "Booking cancelled successfully" });
+    }
+
+    /* ---------------- UPDATE ---------------- */
+    if (!checkInDate || !checkOutDate) {
+      return res.status(400).json({
+        message: "Both checkInDate and checkOutDate are required",
       });
     }
 
-    const checkRoomAvailable = room.bookings.some((b) => {
-      if (
-        b.checkInDate.toISOString() === booking.checkInDate.toISOString() &&
-        b.checkOutDate.toISOString() === booking.checkOutDate.toISOString()
-      ) {
-        return false;
-      }
-      const existingCheckInDate = new Date(b.checkInDate);
-      const existingCheckOutDate = new Date(b.checkOutDate);
-      const newCheckInDate = new Date(checkInDate);
-      const newCheckOutDate = new Date(checkOutDate);
+    const newCheckIn = new Date(checkInDate);
+    const newCheckOut = new Date(checkOutDate);
 
-      // return (
-      //   (newCheckInDate >= existingCheckInDate &&
-      //     newCheckInDate < existingCheckOutDate) ||
-      //   (newCheckOutDate > existingCheckInDate &&
-      //     newCheckOutDate <= existingCheckOutDate) ||
-      //   (newCheckInDate <= existingCheckInDate &&
-      //     newCheckOutDate >= existingCheckOutDate)
-      // );
+    /* availability check */
+    const conflict = room.bookings.some((b) => {
+      if (b.bookingId && b.bookingId.toString() === bookingId) return false;
+
       return (
-        newCheckInDate < existingCheckOutDate &&
-        newCheckOutDate > existingCheckInDate
+        newCheckIn < new Date(b.checkOutDate) &&
+        newCheckOut > new Date(b.checkInDate)
       );
     });
 
-    room.bookings = room.bookings.filter(
-      (b) =>
-        b.checkInDate.toISOString() !== booking.checkInDate.toISOString() ||
-        b.checkOutDate.toISOString() !== booking.checkOutDate.toISOString()
-    );
-
-    if (checkRoomAvailable) {
+    if (conflict) {
       return res
         .status(400)
-        .json({ message: "Room is not available for the selected date" });
+        .json({ message: "Room not available for selected dates" });
     }
-    // room.bookings.push({ checkInDate, checkOutDate });
-    room.bookings.push({
-      checkInDate,
-      checkOutDate,
+
+    /* remove old entry (safe) */
+    room.bookings = room.bookings.filter((b) => {
+      if (b.bookingId) {
+        return b.bookingId.toString() !== bookingId;
+      }
+
+      return !(
+        new Date(b.checkInDate).getTime() ===
+          new Date(booking.checkInDate).getTime() &&
+        new Date(b.checkOutDate).getTime() ===
+          new Date(booking.checkOutDate).getTime()
+      );
     });
-    await room.save();
+
+    /* insert updated entry */
+    room.bookings.push({
+      bookingId,
+      checkInDate: newCheckIn,
+      checkOutDate: newCheckOut,
+    });
 
     await room.save();
-    const updateFields = {};
-    if (checkInDate) updateFields.checkInDate = checkInDate;
-    if (checkOutDate) updateFields.checkOutDate = checkOutDate;
-    if (roomName) updateFields.roomName = roomName;
 
-    if (Object.keys(updateFields).length === 0) {
-      return res.status(400).json({ message: "No fields to update" });
-    }
     const updatedBooking = await Booking.findByIdAndUpdate(
       bookingId,
       {
-        checkInDate,
-        checkOutDate,
+        checkInDate: newCheckIn,
+        checkOutDate: newCheckOut,
         roomName,
       },
-      { new: true, runValidators: true }
+      { new: true }
     );
 
-    // const updatedBooking = await Booking.findByIdAndUpdate(
-    //   bookingId,
-    //   updateFields,
-    //   {
-    //     new: true,
-    //     runValidators: true,
-    //   }
-    // );
-
-    if (!updatedBooking) {
-      return res.status(400).json({ message: "No bookings found" });
-    }
-
     res.status(200).json({
-      message: "Bookings updated successfully",
-      // booking: updatedBooking,
+      message: "Booking updated successfully",
+      booking: updatedBooking,
     });
   } catch (error) {
-    console.error("Error updating booking", error);
-    res.status(500).json({ message: "Failed to update booking" });
+    console.error("Update booking error:", error);
+    res.status(500).json({ message: error.message });
   }
 });
 
