@@ -1070,6 +1070,55 @@ router.post("/verifypayment", async (req, res) => {
   }
 });
 
+router.post(
+  "/razorpay/webhook",
+  express.raw({ type: "application/json" }),
+  async (req, res) => {
+    const signature = req.headers["x-razorpay-signature"];
+
+    const expected = crypto
+      .createHmac("sha256", "5qTR0TR9prVoyHHkmyFGhkVf")
+      .update(req.body)
+      .digest("hex");
+
+    if (signature !== expected) {
+      return res.status(400).json({ message: "Invalid webhook" });
+    }
+
+    const event = JSON.parse(req.body.toString());
+
+    if (event.event === "payment.captured") {
+      const payment = event.payload.payment.entity;
+
+      const booking = await Booking.findOne({
+        razorpayOrderId: payment.order_id,
+      });
+
+      if (booking && booking.paymentStatus !== "paid") {
+        booking.paymentStatus = "paid";
+        booking.status = "confirmed";
+        booking.razorpayPaymentId = payment.id;
+        await booking.save();
+      }
+    }
+
+    if (event.event === "refund.processed") {
+      const refund = event.payload.refund.entity;
+
+      const booking = await Booking.findOne({
+        refundRazorpayId: refund.id,
+      });
+
+      if (booking) {
+        booking.refundStatus = "completed";
+        await booking.save();
+      }
+    }
+
+    res.json({ status: "ok" });
+  }
+);
+
 router.get("/blogs", async (req, res) => {
   res.json(blogs);
 });
