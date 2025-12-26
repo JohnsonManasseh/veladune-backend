@@ -397,6 +397,20 @@ router.put("/updatebooking", async (req, res) => {
     /* =====================================================
        UPDATE / MOVE BOOKING
     ===================================================== */
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const checkIn = new Date(booking.checkInDate);
+    checkIn.setHours(0, 0, 0, 0);
+
+    const daysBeforeCheckIn = (checkIn - today) / (1000 * 60 * 60 * 24);
+
+    if (daysBeforeCheckIn < 3) {
+      return res.status(400).json({
+        message: "Date update not allowed within 3 days of check-in",
+      });
+    }
+
     if (!checkInDate || !checkOutDate || !roomName) {
       return res.status(400).json({
         message: "checkInDate, checkOutDate and roomName are required",
@@ -924,8 +938,8 @@ router.post("/verify-otp", async (req, res) => {
 });
 
 const razorpay = new Razorpay({
-  key_id: "rzp_test_ZlmlnOavXd7ZJ3",
-  key_secret: "5qTR0TR9prVoyHHkmyFGhkVf",
+  key_id: process.env.RAZORPAY_KEY_ID,
+  key_secret: process.env.RAZORPAY_SECRET,
 });
 
 router.post("/applycoupon", async (req, res) => {
@@ -983,92 +997,92 @@ async function createCoupon() {
 
 createCoupon();
 
-router.post("/createorder", async (req, res) => {
-  try {
-    const { amount, bookingId } = req.body;
+// router.post("/createorder", async (req, res) => {
+//   try {
+//     const { amount, bookingId } = req.body;
 
-    if (!amount || !bookingId) {
-      return res
-        .status(400)
-        .json({ message: "amount and bookingId are required" });
-    }
+//     if (!amount || !bookingId) {
+//       return res
+//         .status(400)
+//         .json({ message: "amount and bookingId are required" });
+//     }
 
-    const booking = await Booking.findById(bookingId);
-    if (!booking) {
-      return res.status(404).json({ message: "Booking not found" });
-    }
+//     const booking = await Booking.findById(bookingId);
+//     if (!booking) {
+//       return res.status(404).json({ message: "Booking not found" });
+//     }
 
-    const order = await razorpay.orders.create({
-      amount: Math.round(amount * 100),
-      currency: "INR",
-      receipt: `booking_${bookingId}`,
-    });
+//     const order = await razorpay.orders.create({
+//       amount: Math.round(amount * 100),
+//       currency: "INR",
+//       receipt: `booking_${bookingId}`,
+//     });
 
-    booking.razorpayOrderId = order.id;
-    booking.totalAmount = amount;
-    booking.paymentStatus = "pending";
-    await booking.save();
+//     booking.razorpayOrderId = order.id;
+//     booking.totalAmount = amount;
+//     booking.paymentStatus = "pending";
+//     await booking.save();
 
-    res.status(200).json(order);
-  } catch (error) {
-    console.error("Error creating order:", error);
-    res.status(500).json({ error: error.message });
-  }
-});
+//     res.status(200).json(order);
+//   } catch (error) {
+//     console.error("Error creating order:", error);
+//     res.status(500).json({ error: error.message });
+//   }
+// });
 
-router.post("/verifypayment", async (req, res) => {
-  try {
-    const { bookingId, razorpayPaymentId, razorpayOrderId, razorpaySignature } =
-      req.body;
+// router.post("/verifypayment", async (req, res) => {
+//   try {
+//     const { bookingId, razorpayPaymentId, razorpayOrderId, razorpaySignature } =
+//       req.body;
 
-    if (
-      !bookingId ||
-      !razorpayPaymentId ||
-      !razorpayOrderId ||
-      !razorpaySignature
-    ) {
-      return res.status(400).json({
-        message: "Missing payment verification fields",
-      });
-    }
+//     if (
+//       !bookingId ||
+//       !razorpayPaymentId ||
+//       !razorpayOrderId ||
+//       !razorpaySignature
+//     ) {
+//       return res.status(400).json({
+//         message: "Missing payment verification fields",
+//       });
+//     }
 
-    const booking = await Booking.findById(bookingId);
-    if (!booking) {
-      return res.status(404).json({ message: "Booking not found" });
-    }
+//     const booking = await Booking.findById(bookingId);
+//     if (!booking) {
+//       return res.status(404).json({ message: "Booking not found" });
+//     }
 
-    /* ---------- VERIFY SIGNATURE ---------- */
-    const body = `${razorpayOrderId}|${razorpayPaymentId}`;
+//     /* ---------- VERIFY SIGNATURE ---------- */
+//     const body = `${razorpayOrderId}|${razorpayPaymentId}`;
 
-    const expectedSignature = crypto
-      .createHmac("sha256", "5qTR0TR9prVoyHHkmyFGhkVf")
-      .update(body)
-      .digest("hex");
+//     const expectedSignature = crypto
+//       .createHmac("sha256", "5qTR0TR9prVoyHHkmyFGhkVf")
+//       .update(body)
+//       .digest("hex");
 
-    if (expectedSignature !== razorpaySignature) {
-      return res.status(400).json({
-        message: "Payment verification failed",
-      });
-    }
+//     if (expectedSignature !== razorpaySignature) {
+//       return res.status(400).json({
+//         message: "Payment verification failed",
+//       });
+//     }
 
-    /* ---------- SAVE PAYMENT ---------- */
-    booking.razorpayPaymentId = razorpayPaymentId;
-    booking.razorpayOrderId = razorpayOrderId;
-    booking.paymentStatus = "paid";
-    booking.status = "confirmed";
+//     /* ---------- SAVE PAYMENT ---------- */
+//     booking.razorpayPaymentId = razorpayPaymentId;
+//     booking.razorpayOrderId = razorpayOrderId;
+//     booking.paymentStatus = "paid";
+//     booking.status = "confirmed";
 
-    await booking.save();
+//     await booking.save();
 
-    return res.json({
-      message: "Payment verified and booking confirmed",
-    });
-  } catch (error) {
-    console.error("Verify payment error:", error);
-    return res.status(500).json({
-      message: "Payment verification failed",
-    });
-  }
-});
+//     return res.json({
+//       message: "Payment verified and booking confirmed",
+//     });
+//   } catch (error) {
+//     console.error("Verify payment error:", error);
+//     return res.status(500).json({
+//       message: "Payment verification failed",
+//     });
+//   }
+// });
 
 router.post(
   "/razorpay/webhook",
@@ -1077,7 +1091,7 @@ router.post(
     const signature = req.headers["x-razorpay-signature"];
 
     const expected = crypto
-      .createHmac("sha256", "5qTR0TR9prVoyHHkmyFGhkVf")
+      .createHmac("sha256", process.env.RAZORPAY_SECRET)
       .update(req.body)
       .digest("hex");
 

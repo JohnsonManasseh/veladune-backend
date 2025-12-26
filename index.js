@@ -22,6 +22,7 @@ const upload = multer();
 app.use(upload.none());
 app.use(express.json());
 app.use("/v1/", bookingRoutes);
+app.use("/v1/payments", require("./routes/payment.routes"));
 
 const uri = process.env.MONGO_URI;
 mongoose
