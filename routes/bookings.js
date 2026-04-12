@@ -13,7 +13,7 @@ const bcrypt = require("bcryptjs");
 const twilio = require("twilio");
 const client = twilio(
   "ACb6cc4abbd82df53d9a43ee6add878ebd",
-  "672c9d70fb1503bc3e2cb71dfa40ec5e"
+  "672c9d70fb1503bc3e2cb71dfa40ec5e",
 );
 const nodemailer = require("nodemailer");
 const { chromium } = require("playwright");
@@ -320,7 +320,7 @@ router.put("/updatebooking", async (req, res) => {
       const checkIn = new Date(booking.checkInDate);
 
       const daysBeforeCheckIn = Math.ceil(
-        (checkIn - now) / (1000 * 60 * 60 * 24)
+        (checkIn - now) / (1000 * 60 * 60 * 24),
       );
 
       let refundAmount = 0;
@@ -340,7 +340,7 @@ router.put("/updatebooking", async (req, res) => {
             new Date(b.checkInDate).getTime() !==
               new Date(booking.checkInDate).getTime() ||
             new Date(b.checkOutDate).getTime() !==
-              new Date(booking.checkOutDate).getTime()
+              new Date(booking.checkOutDate).getTime(),
         );
         await room.save();
       }
@@ -353,7 +353,7 @@ router.put("/updatebooking", async (req, res) => {
             {
               amount: Math.round(refundAmount * 100),
               speed: "normal",
-            }
+            },
           );
 
           console.log("✅ RAZORPAY REFUND CREATED:", refund);
@@ -388,8 +388,8 @@ router.put("/updatebooking", async (req, res) => {
           refundAmount > 0 && refundAttempted
             ? `Booking cancelled. ₹${refundAmount} refund initiated.`
             : refundAmount > 0
-            ? "Booking cancelled. Refund could not be initiated."
-            : "Booking cancelled. No refund as per policy.",
+              ? "Booking cancelled. Refund could not be initiated."
+              : "Booking cancelled. No refund as per policy.",
         refundAmount,
       });
     }
@@ -456,7 +456,7 @@ router.put("/updatebooking", async (req, res) => {
           new Date(b.checkInDate).getTime() !==
             new Date(booking.checkInDate).getTime() ||
           new Date(b.checkOutDate).getTime() !==
-            new Date(booking.checkOutDate).getTime()
+            new Date(booking.checkOutDate).getTime(),
       );
       await oldRoom.save();
     }
@@ -656,7 +656,7 @@ router.post("/register", async (req, res) => {
       JWT_SECRET,
       {
         expiresIn: "1hr",
-      }
+      },
     );
     res
       .status(201)
@@ -707,7 +707,7 @@ router.post("/savedetails", async (req, res) => {
       JWT_SECRET,
       {
         expiresIn: "1hr",
-      }
+      },
     );
     res
       .status(201)
@@ -745,7 +745,7 @@ router.post("/login", async (req, res) => {
       JWT_SECRET,
       {
         expiresIn: "1hr",
-      }
+      },
     );
     res.status(201).json({
       token: token,
@@ -921,7 +921,7 @@ router.post("/verify-otp", async (req, res) => {
       const token = jwt.sign(
         { userId: user._id, phoneNumber: user.phoneNumber },
         JWT_SECRET,
-        { expiresIn: "1hr" }
+        { expiresIn: "1hr" },
       );
 
       return res.status(200).json({
@@ -997,93 +997,6 @@ async function createCoupon() {
 
 createCoupon();
 
-// router.post("/createorder", async (req, res) => {
-//   try {
-//     const { amount, bookingId } = req.body;
-
-//     if (!amount || !bookingId) {
-//       return res
-//         .status(400)
-//         .json({ message: "amount and bookingId are required" });
-//     }
-
-//     const booking = await Booking.findById(bookingId);
-//     if (!booking) {
-//       return res.status(404).json({ message: "Booking not found" });
-//     }
-
-//     const order = await razorpay.orders.create({
-//       amount: Math.round(amount * 100),
-//       currency: "INR",
-//       receipt: `booking_${bookingId}`,
-//     });
-
-//     booking.razorpayOrderId = order.id;
-//     booking.totalAmount = amount;
-//     booking.paymentStatus = "pending";
-//     await booking.save();
-
-//     res.status(200).json(order);
-//   } catch (error) {
-//     console.error("Error creating order:", error);
-//     res.status(500).json({ error: error.message });
-//   }
-// });
-
-// router.post("/verifypayment", async (req, res) => {
-//   try {
-//     const { bookingId, razorpayPaymentId, razorpayOrderId, razorpaySignature } =
-//       req.body;
-
-//     if (
-//       !bookingId ||
-//       !razorpayPaymentId ||
-//       !razorpayOrderId ||
-//       !razorpaySignature
-//     ) {
-//       return res.status(400).json({
-//         message: "Missing payment verification fields",
-//       });
-//     }
-
-//     const booking = await Booking.findById(bookingId);
-//     if (!booking) {
-//       return res.status(404).json({ message: "Booking not found" });
-//     }
-
-//     /* ---------- VERIFY SIGNATURE ---------- */
-//     const body = `${razorpayOrderId}|${razorpayPaymentId}`;
-
-//     const expectedSignature = crypto
-//       .createHmac("sha256", "5qTR0TR9prVoyHHkmyFGhkVf")
-//       .update(body)
-//       .digest("hex");
-
-//     if (expectedSignature !== razorpaySignature) {
-//       return res.status(400).json({
-//         message: "Payment verification failed",
-//       });
-//     }
-
-//     /* ---------- SAVE PAYMENT ---------- */
-//     booking.razorpayPaymentId = razorpayPaymentId;
-//     booking.razorpayOrderId = razorpayOrderId;
-//     booking.paymentStatus = "paid";
-//     booking.status = "confirmed";
-
-//     await booking.save();
-
-//     return res.json({
-//       message: "Payment verified and booking confirmed",
-//     });
-//   } catch (error) {
-//     console.error("Verify payment error:", error);
-//     return res.status(500).json({
-//       message: "Payment verification failed",
-//     });
-//   }
-// });
-
 router.post(
   "/razorpay/webhook",
   express.raw({ type: "application/json" }),
@@ -1130,8 +1043,85 @@ router.post(
     }
 
     res.json({ status: "ok" });
-  }
+  },
 );
+
+router.get("/availability", async (req, res) => {
+  try {
+    const { from, to } = req.query;
+
+    // 1. Fetch rooms from DB
+    const rooms = await Room.find();
+
+    if (!rooms.length) {
+      return res.json({
+        disabledDates: [],
+        range: null,
+      });
+    }
+
+    // 2. Collect booked dates
+    const allBookedDates = rooms.flatMap(
+      (room) =>
+        room.bookings?.flatMap(({ checkInDate, checkOutDate }) => {
+          const dates = [];
+          let current = new Date(checkInDate);
+          const end = new Date(checkOutDate);
+
+          while (current < end) {
+            dates.push(current.toISOString().split("T")[0]);
+            current.setDate(current.getDate() + 1);
+          }
+
+          return dates;
+        }) || [],
+    );
+
+    // 3. Count bookings per date
+    const dateCount = allBookedDates.reduce((acc, date) => {
+      acc[date] = (acc[date] || 0) + 1;
+      return acc;
+    }, {});
+
+    const totalRooms = rooms.length;
+
+    // 4. Fully booked dates
+    const disabled = Object.keys(dateCount).filter(
+      (date) => dateCount[date] === totalRooms,
+    );
+
+    // 5. Find first available date
+    const formatKey = (date) => new Date(date).toISOString().split("T")[0];
+
+    const disabledSet = new Set(disabled.map(formatKey));
+
+    let today = new Date();
+    let firstAvailable = new Date(today);
+
+    while (disabledSet.has(formatKey(firstAvailable))) {
+      firstAvailable.setDate(firstAvailable.getDate() + 1);
+    }
+
+    let nextAvailable = new Date(firstAvailable);
+    nextAvailable.setDate(nextAvailable.getDate() + 1);
+
+    while (disabledSet.has(formatKey(nextAvailable))) {
+      nextAvailable.setDate(nextAvailable.getDate() + 1);
+    }
+
+    // 6. Send response
+    res.json({
+      disabledDates: disabled,
+      range: {
+        from: firstAvailable,
+        to: nextAvailable,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Something went wrong" });
+  }
+});
 
 router.get("/blogs", async (req, res) => {
   res.json(blogs);

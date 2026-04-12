@@ -1,9 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
-const bookingRoutes = require("./routes/bookings");
-const cors = require("cors"); // Import cors package
-
+const cors = require("cors");
 const multer = require("multer");
 
 dotenv.config();
@@ -21,7 +19,7 @@ app.use(cors(corsOptions));
 const upload = multer();
 app.use(upload.none());
 app.use(express.json());
-app.use("/v1/", bookingRoutes);
+app.use("/v1/", require("./routes/bookings"));
 app.use("/v1/payments", require("./routes/payment.routes"));
 
 const uri = process.env.MONGO_URI;
