@@ -12,8 +12,8 @@ const router = express.Router();
 const bcrypt = require("bcryptjs");
 const twilio = require("twilio");
 const client = twilio(
-  "ACb6cc4abbd82df53d9a43ee6add878ebd",
-  "672c9d70fb1503bc3e2cb71dfa40ec5e",
+  process.env.TWILIO_ACCOUNT_SID,
+  process.env.TWILIO_AUTH_TOKEN,
 );
 const nodemailer = require("nodemailer");
 const { chromium } = require("playwright");
@@ -188,8 +188,8 @@ router.post("/addbooking", async (req, res) => {
       port: 465,
       secure: true,
       auth: {
-        user: "info@veladune.com",
-        pass: "21596rocker",
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
       },
     });
 
@@ -840,8 +840,8 @@ router.post("/contact", async (req, res) => {
     port: 465,
     secure: true,
     auth: {
-      user: "info@veladune.com",
-      pass: "21596rocker",
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
     },
   });
 
@@ -865,28 +865,6 @@ router.post("/contact", async (req, res) => {
     res.status(500).json({ success: false, message: "Failed to send email" });
   }
 });
-
-// const clearBookings = async (roomId) => {
-//   try {
-//     await Room.findByIdAndUpdate(roomId, { $set: { bookings: [] } });
-//     console.log("Bookings cleared successfully");
-//   } catch (error) {
-//     console.error("Error clearing bookings:", error);
-//   }
-// };
-
-// clearBookings("6794d937e81be69386b8e88b");
-
-// const deleteBookingsForUser = async (email) => {
-//   try {
-//     const result = await Booking.deleteMany({ email });
-//     console.log(`${result.deletedCount} bookings deleted.`);
-//   } catch (error) {
-//     console.error("Error deleting bookings:", error);
-//   }
-// };
-
-// deleteBookingsForUser("johnsonrockstar@gmail.com");
 
 router.post("/send-otp", async (req, res) => {
   const { phoneNumber } = req.body;
