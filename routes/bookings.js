@@ -1026,7 +1026,10 @@ router.post(
 
 router.get("/availability", async (req, res) => {
   try {
-    const rooms = await Room.find().lean();
+    const { from, to } = req.query;
+
+    // 1. Fetch rooms from DB
+    const rooms = await Room.find();
 
     if (!rooms.length) {
       return res.json({
@@ -1035,36 +1038,24 @@ router.get("/availability", async (req, res) => {
       });
     }
 
-    // Format date in IST (YYYY-MM-DD) to avoid UTC midnight shift
-    const formatISTDate = (date) =>
-      new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Kolkata" }).format(
-        new Date(date),
-      );
+    // 2. Collect booked dates
+    const allBookedDates = rooms.flatMap(
+      (room) =>
+        room.bookings?.flatMap(({ checkInDate, checkOutDate }) => {
+          const dates = [];
+          let current = new Date(checkInDate);
+          const end = new Date(checkOutDate);
 
-    // 1. Collect unique booked nights per room (prevents single-room double-counting)
-    const allBookedDates = rooms.flatMap((room) => {
-      const roomDates = new Set();
+          while (current < end) {
+            dates.push(current.toISOString().split("T")[0]);
+            current.setDate(current.getDate() + 1);
+          }
 
-      (room.bookings || []).forEach(({ checkInDate, checkOutDate }) => {
-        if (!checkInDate || !checkOutDate) return;
+          return dates;
+        }) || [],
+    );
 
-        const current = new Date(checkInDate);
-        const end = new Date(checkOutDate);
-
-        if (Number.isNaN(current.getTime()) || Number.isNaN(end.getTime())) {
-          return;
-        }
-
-        while (current < end) {
-          roomDates.add(formatISTDate(current));
-          current.setDate(current.getDate() + 1);
-        }
-      });
-
-      return Array.from(roomDates);
-    });
-
-    // 2. Count how many rooms are booked per night
+    // 3. Count bookings per date
     const dateCount = allBookedDates.reduce((acc, date) => {
       acc[date] = (acc[date] || 0) + 1;
       return acc;
@@ -1072,34 +1063,41 @@ router.get("/availability", async (req, res) => {
 
     const totalRooms = rooms.length;
 
-    // 3. Dates where every cabin is booked
-    const disabled = Object.keys(dateCount)
-      .filter((date) => dateCount[date] >= totalRooms)
-      .sort();
+    // 4. Fully booked dates
+    const disabled = Object.keys(dateCount).filter(
+      (date) => dateCount[date] === totalRooms,
+    );
 
-    const disabledSet = new Set(disabled);
+    // 5. Find first available date
+    const formatKey = (date) => new Date(date).toISOString().split("T")[0];
 
-    // 4. Find earliest available check-in night & next-day check-out
-    const firstAvailable = new Date();
-    firstAvailable.setHours(12, 0, 0, 0); // Normalize to noon to avoid DST/midnight edge cases
+    const disabledSet = new Set(disabled.map(formatKey));
 
-    while (disabledSet.has(formatISTDate(firstAvailable))) {
+    let today = new Date();
+    let firstAvailable = new Date(today);
+
+    while (disabledSet.has(formatKey(firstAvailable))) {
       firstAvailable.setDate(firstAvailable.getDate() + 1);
     }
 
-    const nextAvailable = new Date(firstAvailable);
+    let nextAvailable = new Date(firstAvailable);
     nextAvailable.setDate(nextAvailable.getDate() + 1);
 
-    return res.json({
+    while (disabledSet.has(formatKey(nextAvailable))) {
+      nextAvailable.setDate(nextAvailable.getDate() + 1);
+    }
+
+    // 6. Send response
+    res.json({
       disabledDates: disabled,
       range: {
-        from: formatISTDate(firstAvailable),
-        to: formatISTDate(nextAvailable),
+        from: firstAvailable,
+        to: nextAvailable,
       },
     });
   } catch (error) {
-    console.error("Availability API Error:", error);
-    return res.status(500).json({ message: "Something went wrong" });
+    console.error(error);
+    res.status(500).json({ message: "Something went wrong" });
   }
 });
 
